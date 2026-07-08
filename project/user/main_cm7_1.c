@@ -49,7 +49,8 @@
 #define max_scan_line (width * height)
 
 #define THRESH_LOW 80
-#define THRESH_MID 200
+#define THRESH_MID 120
+#define THRESH_CAR 180
 #define THRESH_HIGH 255
 
 #define WIFI_OPEN 1
@@ -337,7 +338,7 @@ Blob detect_beacon(BeaconTracker *tracker, Blob *exclude_beacon, Blob *car)
                 int w = (b.max_x - b.min_x) + 1;
                 int h = (b.max_y - b.min_y) + 1;
 
-                if (b.area > 15 && b.area < 500 && w > 4 && h > 4)
+                if (b.area > 5 && b.area < 500 && w > 2 && h > 2)
                 {
 
                     if (exclude_beacon != NULL && exclude_beacon->area > 0)
@@ -353,9 +354,9 @@ Blob detect_beacon(BeaconTracker *tracker, Blob *exclude_beacon, Blob *car)
                     int bounding_box_area = w * h;
                     float fill_ratio = (float)b.area / bounding_box_area;
 
-                    if (aspect_ratio > 0.6f && aspect_ratio < 1.6f)
+                    if (aspect_ratio > 0.5f && aspect_ratio < 2.0f)
                     {
-                        if (fill_ratio > 0.5f && fill_ratio < 0.90f)
+                        if (fill_ratio > 0.6f && fill_ratio < 1.0f)
                         {
                             float box_center_x = b.min_x + w / 2.0f;
                             float box_center_y = b.min_y + h / 2.0f;
@@ -410,23 +411,23 @@ Blob detect_car()
                 continue;
 
             uint8 pixel = image_arr[y][x];
-            if (pixel >= THRESH_MID)
+            if (pixel >= THRESH_CAR)
             {
-                Blob yb = find_blob(x, y, THRESH_MID, THRESH_HIGH);
+                Blob yb = find_blob(x, y, THRESH_CAR, THRESH_HIGH);
 
                 int w = (yb.max_x - yb.min_x) + 1;
                 int h = (yb.max_y - yb.min_y) + 1;
 
-                if (yb.area > 100 && yb.area < 1500 && w > 5 && h > 5)
+                if (yb.area > 30 && yb.area < 800 && w > 5 && h > 5)
                 {
 
                     float aspect_ratio = (float)w / h;
                     int bounding_box_area = w * h;
                     float fill_ratio = (float)yb.area / bounding_box_area;
 
-                    if (aspect_ratio > 0.4f && aspect_ratio < 2.5f)
+                    if (aspect_ratio > 0.1f && aspect_ratio < 10.0f)
                     {
-                        if (fill_ratio > 0.15f && fill_ratio < 0.75f)
+                        if (fill_ratio > 0.15f && fill_ratio < 0.6f)
                         {
                             if (yb.area > car.area)
                             {
@@ -571,6 +572,8 @@ int main(void)
     while (true)
     {
         memcpy(image_arr[0], mt9v03x_image[0], max_scan_line);
+
+        memset(visited, 0, sizeof(visited));
 
         Blob car = detect_car();
 
@@ -728,8 +731,24 @@ int main(void)
                 image_copy[y][car.max_x] = 255;
             }
         }
-        
-        seekfree_assistant_camera_send();
+
+        // 大于阈值改为255，小于阈值改为0
+        for (int i = 0; i < MT9V03X_H; i++)
+        {
+            for (int j = 0; j < MT9V03X_W; j++)
+            {
+                if (image_copy[i][j] > THRESH_MID)
+                {
+                    image_copy[i][j] = 255;
+                }
+                else
+                {
+                    image_copy[i][j] = 0;
+                }
+            }
+        }
+
+            seekfree_assistant_camera_send();
 
 #endif
     }
