@@ -1,0 +1,24 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "C/C++ Runner: Debug Session",
+      "type": "cppdbg",
+      "request": "launch",
+      "args": [],
+      "stopAtEntry": false,
+      "externalConsole": true,
+      "cwd": "c:/library/CYT2BL3_Brushless_Driver_4IN1_Project-master/CYT2BL3_Brushless_Driver_4IN1_Project-master/CYT2BL3_Brushless_Driver_4IN1_Project/project/user",
+      "program": "c:/library/CYT2BL3_Brushless_Driver_4IN1_Project-master/CYT2BL3_Brushless_Driver_4IN1_Project-master/CYT2BL3_Brushless_Driver_4IN1_Project/project/user/build/Debug/outDebug",
+      "MIMode": "gdb",
+      "miDebuggerPath": "gdb",
+      "setupCommands": [
+        {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        }
+      ]
+    }
+  ]
+}
