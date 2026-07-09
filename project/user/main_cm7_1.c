@@ -50,7 +50,7 @@
 
 #define THRESH_LOW 80
 #define THRESH_MID 120
-#define THRESH_CAR 180
+#define THRESH_CAR 200
 #define THRESH_HIGH 255
 
 #define WIFI_OPEN 1
@@ -344,7 +344,7 @@ Blob detect_beacon(BeaconTracker *tracker, Blob *exclude_beacon, Blob *car)
                     if (exclude_beacon != NULL && exclude_beacon->area > 0)
                     {
                         float dist = sqrt((b.cx - exclude_beacon->cx) * (b.cx - exclude_beacon->cx) + (b.cy - exclude_beacon->cy) * (b.cy - exclude_beacon->cy));
-                        if (dist < 15.0f)
+                        if (dist < 12.0f)
                         {
                             continue;
                         }
