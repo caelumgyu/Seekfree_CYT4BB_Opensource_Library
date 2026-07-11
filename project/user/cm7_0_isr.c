@@ -71,9 +71,9 @@ PID_Struct yaw_pid = {.Kp = 0.8f, .Ki = 0.00f, .Kd = 0.00f, .out_min = -500.0f, 
 PID_Struct distance_pid = {.Kp = 3.0f, .Ki = 0.0f, .Kd = 0.0002f, .out_min = -1500.0f, .out_max = 1500.0f, .desire = 120.0f};
 PID_Struct velocity_pid = {.Kp = 1.5f, .Ki = 0.01f, .Kd = 0.001f, .out_min = -2400.0f, .out_max = 2400.0f};
 
-// 定点
-PID_Struct position_x_pid = {.Kp = 0.0f, .Ki = 0.0f, .Kd = 0.0f, .out_min = -800.0f, .out_max = 800.0f};
-PID_Struct position_y_pid = {.Kp = 0.0f, .Ki = 0.0f, .Kd = 0.0f, .out_min = -800.0f, .out_max = 800.0f};
+// // 定点
+// PID_Struct position_x_pid = {.Kp = 0.0f, .Ki = 0.0f, .Kd = 0.0f, .out_min = -800.0f, .out_max = 800.0f};
+// PID_Struct position_y_pid = {.Kp = 0.0f, .Ki = 0.0f, .Kd = 0.0f, .out_min = -800.0f, .out_max = 800.0f};
 
 PID_Struct acc_y_pid = {.Kp = 0.8f, .Ki = 0.00f, .Kd = 0.00f, .out_min = -2000.0f, .out_max = 2000.0f};
 LADRC_1st_Struct gyro_y_adrc = {.b0 = 3.0f, .wo = 88.0f, .wc = 6.8f, .z1 = 0, .z2 = 0}; // 俯仰角速度

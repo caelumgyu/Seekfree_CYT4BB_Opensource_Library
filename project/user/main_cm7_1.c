@@ -338,7 +338,7 @@ Blob detect_beacon(BeaconTracker *tracker, Blob *exclude_beacon, Blob *car)
                 int w = (b.max_x - b.min_x) + 1;
                 int h = (b.max_y - b.min_y) + 1;
 
-                if (b.area > 5 && b.area < 500 && w > 2 && h > 2)
+                if (b.area > 3 && b.area < 500 && w > 1 && h > 1)
                 {
 
                     if (exclude_beacon != NULL && exclude_beacon->area > 0)
