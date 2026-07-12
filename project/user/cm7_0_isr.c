@@ -43,10 +43,10 @@
 #include "small_driver_uart_control.h"
 
 bool flow_complete = false;
-bool dir1 = false; // 一般情况下true会让电机顺时针旋转
-bool dir2 = false; // 但是具体情况还要看电机的接线方式，可能需要调整
+bool dir1 = true; // 一般情况下true会让电机顺时针旋转
+bool dir2 = true; // 但是具体情况还要看电机的接线方式，可能需要调整
 bool dir3 = true;  // 这里的电机1因为接线不同导致反转，所以设置为false，其他三个电机接线方式相同，所以设置为true
-bool dir4 = false; // 如果陀螺仪数据与预期的旋转方向相反，可以通过调整这些方向变量来修正
+bool dir4 = true; // 如果陀螺仪数据与预期的旋转方向相反，可以通过调整这些方向变量来修正
 int16_t output_duty1 = 0;
 int16_t output_duty2 = 0;
 int16_t output_duty3 = 0;
@@ -76,9 +76,9 @@ PID_Struct velocity_pid = {.Kp = 1.5f, .Ki = 0.01f, .Kd = 0.001f, .out_min = -24
 // PID_Struct position_y_pid = {.Kp = 0.0f, .Ki = 0.0f, .Kd = 0.0f, .out_min = -800.0f, .out_max = 800.0f};
 
 PID_Struct acc_y_pid = {.Kp = 0.8f, .Ki = 0.00f, .Kd = 0.00f, .out_min = -2000.0f, .out_max = 2000.0f};
-LADRC_1st_Struct gyro_y_adrc = {.b0 = 3.0f, .wo = 88.0f, .wc = 6.8f, .z1 = 0, .z2 = 0}; // 俯仰角速度
-LADRC_1st_Struct gyro_x_adrc = {.b0 = 3.0f, .wo = 98.0f, .wc = 7.2f, .z1 = 0, .z2 = 0}; // 横滚角速度
-LADRC_1st_Struct gyro_z_adrc = {.b0 = 3.0f, .wo = 56.0f, .wc = 4.8f, .z1 = 0, .z2 = 0}; // 偏航角速度
+LADRC_1st_Struct gyro_y_adrc = {.b0 = 3.9f, .wo = 88.0f, .wc = 6.8f, .z1 = 0, .z2 = 0}; // 俯仰角速度
+LADRC_1st_Struct gyro_x_adrc = {.b0 = 3.9f, .wo = 98.0f, .wc = 7.2f, .z1 = 0, .z2 = 0}; // 横滚角速度
+LADRC_1st_Struct gyro_z_adrc = {.b0 = 3.9f, .wo = 56.0f, .wc = 4.8f, .z1 = 0, .z2 = 0}; // 偏航角速度
 
 LADRC_1st_Struct *LADRC_p[3] = {&gyro_x_adrc, &gyro_y_adrc, &gyro_z_adrc};
 
@@ -198,11 +198,11 @@ void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
         // 最终全局油门 = 悬停基准值 + 串级内环的输出补偿量
         global_output = base_hover_throttle + velocity_pid.output;
         global_output = compare_float(global_output, MIN_DUTY * 100.0f, 90 * 100.0f);
-        // global_output = 1000;
 
         // 全局油门低通滤波
         global_output = 0.7f * global_output + 0.3f * last_global_output;
         last_global_output = global_output;
+        global_output = 500;
 
         // 作用给电机
         // 三者为叠加关系 (根据陀螺仪和四旋翼的方位关系来调整)

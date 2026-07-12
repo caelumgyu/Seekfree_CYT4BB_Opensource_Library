@@ -89,9 +89,9 @@ int main(void)
     {
         vl53l8cx_get_distance();
         // 此处编写需要循环执行的代码
-        // printf("Data:%0.2f,   %0.2f,   %0.2f\n", imu660rc_pitch, imu660rc_roll, imu660rc_yaw);
+        printf("Data:%0.2f,   %0.2f,   %0.2f\n", imu660rc_pitch, imu660rc_roll, imu660rc_yaw);
         // printf("Data:%0.2f,   %0.2f,   %0.2f\n", imu660rc_acc_x, imu660rc_acc_y, imu660rc_acc_z);
-        printf("Data:%0.2f,   %0.2f,   %0.2f,   %0.2f,    %d\n", distance_pid.output, velocity_pid.output, global_output, distance_pid.desire, vl53l8cx_distance_mm);
+        // printf("Data:%0.2f,   %0.2f,   %0.2f,   %0.2f,    %d\n", distance_pid.output, velocity_pid.output, global_output, distance_pid.desire, vl53l8cx_distance_mm);
         // printf("out:%0.2f   ,%0.2f   ,%0.2f \r\n", out_roll, out_pitch, out_yaw);
 
         // ADC测电压 1秒一次

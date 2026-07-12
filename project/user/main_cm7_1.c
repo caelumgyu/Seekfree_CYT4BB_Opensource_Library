@@ -49,7 +49,7 @@
 #define max_scan_line (width * height)
 
 #define THRESH_LOW 80
-#define THRESH_MID 120
+#define THRESH_MID 100
 #define THRESH_CAR 200
 #define THRESH_HIGH 255
 
@@ -331,20 +331,20 @@ Blob detect_beacon(BeaconTracker *tracker, Blob *exclude_beacon, Blob *car)
                 if (car != NULL && car->area > 0)
                 {
                     float dist1 = sqrt((b.cx - car->cx) * (b.cx - car->cx) + (b.cy - car->cy) * (b.cy - car->cy));
-                    if (dist1 < 15.0f)
+                    if (dist1 < 8.0f)
                         continue;
                 }
 
                 int w = (b.max_x - b.min_x) + 1;
                 int h = (b.max_y - b.min_y) + 1;
 
-                if (b.area > 3 && b.area < 500 && w > 1 && h > 1)
+                if (b.area > 1 && b.area < 100 && w > 0 && h > 0)
                 {
 
                     if (exclude_beacon != NULL && exclude_beacon->area > 0)
                     {
                         float dist = sqrt((b.cx - exclude_beacon->cx) * (b.cx - exclude_beacon->cx) + (b.cy - exclude_beacon->cy) * (b.cy - exclude_beacon->cy));
-                        if (dist < 12.0f)
+                        if (dist < 10.0f)
                         {
                             continue;
                         }
@@ -353,7 +353,10 @@ Blob detect_beacon(BeaconTracker *tracker, Blob *exclude_beacon, Blob *car)
                     float aspect_ratio = (float)w / h;
                     int bounding_box_area = w * h;
                     float fill_ratio = (float)b.area / bounding_box_area;
-
+                    if ((w < 4 && h < 2) || (w < 2 && h < 4)) // 极远处信标
+                    {
+                        goto check_beacon;
+                    }
                     if (aspect_ratio > 0.5f && aspect_ratio < 2.0f)
                     {
                         if (fill_ratio > 0.6f && fill_ratio < 1.0f)
@@ -364,6 +367,7 @@ Blob detect_beacon(BeaconTracker *tracker, Blob *exclude_beacon, Blob *car)
 
                             if (center_offset < (w * 0.3f))
                             {
+                            check_beacon:
                                 if (b.area > best_beacon.area)
                                 {
                                     best_beacon = b;
@@ -418,14 +422,14 @@ Blob detect_car()
                 int w = (yb.max_x - yb.min_x) + 1;
                 int h = (yb.max_y - yb.min_y) + 1;
 
-                if (yb.area > 30 && yb.area < 800 && w > 5 && h > 5)
+                if (yb.area > 30 && yb.area < 100 && w > 5 && h > 5)
                 {
 
                     float aspect_ratio = (float)w / h;
                     int bounding_box_area = w * h;
                     float fill_ratio = (float)yb.area / bounding_box_area;
 
-                    if (aspect_ratio > 0.1f && aspect_ratio < 10.0f)
+                    if (aspect_ratio > 0.2f && aspect_ratio < 5.0f)
                     {
                         if (fill_ratio > 0.15f && fill_ratio < 0.6f)
                         {
@@ -539,7 +543,7 @@ int main(void)
     mt9v03x_init();
 
     uart_init(UART_4, 115200, UART4_TX_P14_1, UART4_RX_P14_0);
-    //uart_rx_interrupt(UART_4, 1);
+    // uart_rx_interrupt(UART_4, 1);
 
 #if WIFI_OPEN
     wifi_spi_init(WIFI_SSID_TEST, WIFI_PASSWORD_TEST);
@@ -626,7 +630,7 @@ int main(void)
                 car.dir_y = -1;
             }
         }
-        
+
         if (beacon1.area == 0 && beacon2.area == 0)
         {
             beacon_loast = true;
@@ -692,7 +696,7 @@ int main(void)
                 image_copy[i][tracker2.search_max_x] = 255;
             }
         }
-        if(beacon1.area > 0)
+        if (beacon1.area > 0)
         {
             for (int x = beacon1.min_x; x <= beacon1.max_x; x++)
             {
@@ -705,7 +709,7 @@ int main(void)
                 image_copy[y][beacon1.max_x] = 255;
             }
         }
-        if(beacon2.area > 0)
+        if (beacon2.area > 0)
         {
             for (int x = beacon2.min_x; x <= beacon2.max_x; x++)
             {
@@ -733,22 +737,22 @@ int main(void)
         }
 
         // 大于阈值改为255，小于阈值改为0
-        for (int i = 0; i < MT9V03X_H; i++)
-        {
-            for (int j = 0; j < MT9V03X_W; j++)
-            {
-                if (image_copy[i][j] > THRESH_MID)
-                {
-                    image_copy[i][j] = 255;
-                }
-                else
-                {
-                    image_copy[i][j] = 0;
-                }
-            }
-        }
+        // for (int i = 0; i < MT9V03X_H; i++)
+        // {
+        //     for (int j = 0; j < MT9V03X_W; j++)
+        //     {
+        //         if (image_copy[i][j] > THRESH_MID)
+        //         {
+        //             image_copy[i][j] = 255;
+        //         }
+        //         else
+        //         {
+        //             image_copy[i][j] = 0;
+        //         }
+        //     }
+        // }
 
-            seekfree_assistant_camera_send();
+        seekfree_assistant_camera_send();
 
 #endif
     }
