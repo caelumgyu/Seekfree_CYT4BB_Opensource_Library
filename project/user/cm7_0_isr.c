@@ -60,7 +60,7 @@ int16 dist;
 
 float last_filtered_distance_mm = 0; // 记录上一次高度求微分
 float current_vel_mm_s = 0;          // 当前垂直速度
-float base_hover_throttle = 7100.0f; // 基础悬停油门
+float base_hover_throttle = 6800.0f; // 基础悬停油门
 
 // PID结构体(先调内环，后调外环)
 PID_Struct pitch_pid = {.Kp = 2.4f, .Ki = 0.00f, .Kd = 0.00f, .out_min = -2000.0f, .out_max = 2000.0f};
@@ -68,7 +68,7 @@ PID_Struct roll_pid = {.Kp = 2.4f, .Ki = 0.00f, .Kd = 0.00f, .out_min = -2000.0f
 PID_Struct yaw_pid = {.Kp = 0.8f, .Ki = 0.00f, .Kd = 0.00f, .out_min = -500.0f, .out_max = 500.0f};
 
 // 定高
-PID_Struct distance_pid = {.Kp = 3.0f, .Ki = 0.0f, .Kd = 0.0002f, .out_min = -1500.0f, .out_max = 1500.0f, .desire = 120.0f};
+PID_Struct distance_pid = {.Kp = 1.80f, .Ki = 0.0f, .Kd = 0.0001f, .out_min = -1500.0f, .out_max = 1500.0f, .desire = 120.0f};
 PID_Struct velocity_pid = {.Kp = 1.5f, .Ki = 0.01f, .Kd = 0.001f, .out_min = -2400.0f, .out_max = 2400.0f};
 
 // // 定点
@@ -76,9 +76,9 @@ PID_Struct velocity_pid = {.Kp = 1.5f, .Ki = 0.01f, .Kd = 0.001f, .out_min = -24
 // PID_Struct position_y_pid = {.Kp = 0.0f, .Ki = 0.0f, .Kd = 0.0f, .out_min = -800.0f, .out_max = 800.0f};
 
 PID_Struct acc_y_pid = {.Kp = 0.8f, .Ki = 0.00f, .Kd = 0.00f, .out_min = -2000.0f, .out_max = 2000.0f};
-LADRC_1st_Struct gyro_y_adrc = {.b0 = 3.9f, .wo = 88.0f, .wc = 6.8f, .z1 = 0, .z2 = 0}; // 俯仰角速度
-LADRC_1st_Struct gyro_x_adrc = {.b0 = 3.9f, .wo = 98.0f, .wc = 7.2f, .z1 = 0, .z2 = 0}; // 横滚角速度
-LADRC_1st_Struct gyro_z_adrc = {.b0 = 3.9f, .wo = 56.0f, .wc = 4.8f, .z1 = 0, .z2 = 0}; // 偏航角速度
+LADRC_1st_Struct gyro_y_adrc = {.b0 = 3.6f, .wo = 88.0f, .wc = 6.8f, .z1 = 0, .z2 = 0}; // 俯仰角速度
+LADRC_1st_Struct gyro_x_adrc = {.b0 = 3.6f, .wo = 98.0f, .wc = 7.2f, .z1 = 0, .z2 = 0}; // 横滚角速度
+LADRC_1st_Struct gyro_z_adrc = {.b0 = 3.6f, .wo = 56.0f, .wc = 4.8f, .z1 = 0, .z2 = 0}; // 偏航角速度
 
 LADRC_1st_Struct *LADRC_p[3] = {&gyro_x_adrc, &gyro_y_adrc, &gyro_z_adrc};
 
@@ -93,7 +93,7 @@ void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
     if (lora3a22_uart_transfer.switch_key[1] == 1)
     {
         imu660rc_get_gyro();
-        imu660rc_get_acc();
+        imu660rc_get_acc(); 
 
         // vl53l8cx_get_data();
         // vl53l8cx_get_center_distance(&dist); // 获取中心区域平均距离
@@ -202,7 +202,7 @@ void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
         // 全局油门低通滤波
         global_output = 0.7f * global_output + 0.3f * last_global_output;
         last_global_output = global_output;
-        global_output = 500;
+        // global_output = 1000;
 
         // 作用给电机
         // 三者为叠加关系 (根据陀螺仪和四旋翼的方位关系来调整)
@@ -229,7 +229,7 @@ void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
         //                 global_output + out_roll + out_pitch  // 电机4
         // );
 
-        if (dl1a_distance_mm >= 150 || lora3a22_uart_transfer.switch_key[2] == 1)
+        if (vl53l8cx_distance_mm >= 150 || lora3a22_uart_transfer.switch_key[2] == 1)
         {
             // LADRC_1st_Update(adrc结构体, 期望值, 实际值, 周期时间)gyro_z_meas
             LADRC_1st_Update(&gyro_y_adrc, pitch_pid.output, gyro_y_meas, TIME_DELAY, MAX_DUTY);
@@ -259,16 +259,21 @@ void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
             // } upflow302_receive_struct;
             // 等待光流稳定
 
-            send_uart_motol(global_output - out_roll - out_pitch - out_yaw, // 电机1  成品
-                            global_output - out_roll + out_pitch + out_yaw, // 电机2
-                            global_output + out_roll - out_pitch + out_yaw, // 电机3
-                            global_output + out_roll + out_pitch - out_yaw  // 电机4
-            );
+            // send_uart_motol(global_output - out_roll - out_pitch - out_yaw, // 电机1  成品
+            //                 global_output - out_roll + out_pitch + out_yaw, // 电机2
+            //                 global_output + out_roll - out_pitch + out_yaw, // 电机3
+            //                 global_output + out_roll + out_pitch - out_yaw  // 电机4
+            // );
             // send_uart_motol(global_output + out_roll + out_pitch - out_yaw, // 电机1  自制
             //                 global_output - out_roll + out_pitch + out_yaw, // 电机2
             //                 global_output - out_roll - out_pitch - out_yaw, // 电机3
             //                 global_output + out_roll - out_pitch + out_yaw  // 电机4
             // );
+            send_uart_motol(global_output + out_roll - out_pitch + out_yaw, // 电机1  当前
+                            global_output - out_roll - out_pitch - out_yaw, // 电机2
+                            global_output + out_roll + out_pitch - out_yaw, // 电机3
+                            global_output - out_roll + out_pitch + out_yaw  // 电机4
+            );
         }
         else /* if (dl1a_distance_mm < 150 && lora3a22_uart_transfer.switch_key[2] == 0)*/
         {
