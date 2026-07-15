@@ -188,7 +188,7 @@ void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
                 }
                 else
                 {
-                    target_yaw = base_search_yaw + 90.0f;
+                    target_yaw = base_search_yaw + 120.0f;
                 }
 
                 if (target_yaw > 180.0f)
