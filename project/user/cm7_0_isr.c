@@ -138,12 +138,24 @@ void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
         SCB_CleanInvalidateDCache_by_Addr(&beacon_lost, sizeof(beacon_lost));
         static float base_search_yaw = 0.0f;
         static uint16 search_timer = 0;
+        static uint16 beacon_timer = 0;
         static uint8 search_state = 0;
         static uint8 last_beacon_status = 1;
-        float target_yaw = 0.0f;
+        float target_yaw = base_search_yaw;
 
         if (beacon_lost == 1) // 识别到了信标
         {
+            beacon_timer++;
+            if (last_beacon_status == 0) // 上一次是丢失状态
+            {
+                beacon_timer = 0;
+            }
+            if (beacon_timer > 100)
+            {
+                beacon_timer = 0;
+                base_search_yaw = imu660rc_yaw; // 记录当前偏航角作为基准
+            }
+            target_yaw = base_search_yaw;
             // 重置搜索状态，为下一次丢失做准备
             last_beacon_status = 1;
             search_timer = 0;
@@ -153,8 +165,8 @@ void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
         {
             if (last_beacon_status == 1)
             {
-                base_search_yaw = imu660rc_yaw;
-                target_yaw = base_search_yaw;
+                // base_search_yaw = imu660rc_yaw;
+                // target_yaw = base_search_yaw;
 
                 last_beacon_status = 0;
                 search_timer = 0;
@@ -235,7 +247,7 @@ void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
             distance_pid.desire += lora3a22_uart_transfer.joystick[1] / 500;
         }
 
-        distance_pid.desire = compare_float(distance_pid.desire, 50.0f, 1600.0f);
+        distance_pid.desire = compare_float(distance_pid.desire, 1.0f, 1600.0f);
 
         // global_output += lora3a22_uart_transfer.joystick[1]/1000;
 
