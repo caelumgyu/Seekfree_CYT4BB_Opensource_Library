@@ -53,7 +53,7 @@
 #define THRESH_CAR 200
 #define THRESH_HIGH 255
 
-#define WIFI_OPEN 1
+#define WIFI_OPEN 0
 #define WIFI_SSID_TEST "arch"
 #define WIFI_PASSWORD_TEST "111555999"
 #define TCP_TARGET_IP "10.71.45.119"
@@ -63,7 +63,8 @@
 uint8 image_arr[height][width] = {0};
 bool visited[height][width] = {false};
 uint8 image_copy[height][width];
-bool beacon_loast = false;
+#pragma location = 0x28001014
+uint32 beacon_lost = 0;
 
 typedef struct
 {
@@ -338,7 +339,7 @@ Blob detect_beacon(BeaconTracker *tracker, Blob *exclude_beacon, Blob *car)
                 int w = (b.max_x - b.min_x) + 1;
                 int h = (b.max_y - b.min_y) + 1;
 
-                if (b.area > 1 && b.area < 100 && w > 0 && h > 0)
+                if (b.area > 1 && b.area < 150 && w > 0 && h > 0)
                 {
 
                     if (exclude_beacon != NULL && exclude_beacon->area > 0)
@@ -633,8 +634,12 @@ int main(void)
 
         if (beacon1.area == 0 && beacon2.area == 0)
         {
-            beacon_loast = true;
+            beacon_lost = 0;
+        }else
+        {
+            beacon_lost = 1;
         }
+        SCB_CleanInvalidateDCache_by_Addr(&beacon_lost, sizeof(beacon_lost));
 
         float err_fwd = 0.0f, err_lat = 0.0f;
         Blob target_beacon = {0};
@@ -666,6 +671,7 @@ int main(void)
         sprintf(car_dat, "%0.1f,%0.1f\n", err_fwd, err_lat);
         // printf("%s  ,  %0.2f,   %0.2f\n",car_dat,beacon1.cx,beacon1.cy);
         uart_write_string(UART_4, car_dat);
+
 
 #if WIFI_OPEN
         // 画图
@@ -737,20 +743,20 @@ int main(void)
         }
 
         // 大于阈值改为255，小于阈值改为0
-        // for (int i = 0; i < MT9V03X_H; i++)
-        // {
-        //     for (int j = 0; j < MT9V03X_W; j++)
-        //     {
-        //         if (image_copy[i][j] > THRESH_MID)
-        //         {
-        //             image_copy[i][j] = 255;
-        //         }
-        //         else
-        //         {
-        //             image_copy[i][j] = 0;
-        //         }
-        //     }
-        // }
+        for (int i = 0; i < MT9V03X_H; i++)
+        {
+            for (int j = 0; j < MT9V03X_W; j++)
+            {
+                if (image_copy[i][j] > THRESH_CAR)
+                {
+                    image_copy[i][j] = 255;
+                }
+                else
+                {
+                    image_copy[i][j] = 0;
+                }
+            }
+        }
 
         seekfree_assistant_camera_send();
 

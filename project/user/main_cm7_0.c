@@ -60,6 +60,7 @@ extern float global_output;
 extern float voltage;
 extern bool flow_complete;
 
+
 int main(void)
 {
     clock_init(SYSTEM_CLOCK_250M); 	// 时钟配置及系统初始化<务必保留>
@@ -91,27 +92,21 @@ int main(void)
         // 此处编写需要循环执行的代码
         // printf("Data:%0.2f,   %0.2f,   %0.2f\n", imu660rc_pitch, imu660rc_roll, imu660rc_yaw);
         // printf("Data:%0.2f,   %0.2f,   %0.2f\n", imu660rc_acc_x, imu660rc_acc_y, imu660rc_acc_z);
-        printf("Data:%0.2f,   %0.2f,   %0.2f,   %0.2f,    %d\n", distance_pid.output, velocity_pid.output, global_output, distance_pid.desire, vl53l8cx_distance_mm);
+        // printf("Data:%0.2f,   %0.2f,   %0.2f,   %0.2f,    %d\n", distance_pid.output, velocity_pid.output, global_output, distance_pid.desire, vl53l8cx_distance_mm);
         // printf("out:%0.2f   ,%0.2f   ,%0.2f \r\n", out_roll, out_pitch, out_yaw);
 
         // ADC测电压 1秒一次
         static uint8 adc_count = 0;
-        if (adc_count < 10)
+        if (adc_count < 50)
         {
             adc_count++;
         }
         else
         {
             adc_count = 0;
-            adc_value = adc_mean_filter_convert(ADC0_CH21_P07_5, 5);
+            adc_value = adc_mean_filter_convert(ADC0_CH21_P07_5, 10);
             voltage = (adc_value) * (223.0f / 20.0f) * (3.3f / 4096.0f);
             // printf("Voltage:%0.2f\n", voltage);
-        }
-
-        // 当光流稳定后，统计五十次陀螺仪的值，用于校准
-        if (flow_complete == true)
-        {
-            
         }
 
         system_delay_ms(20);
