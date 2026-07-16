@@ -62,13 +62,16 @@ float last_filtered_distance_mm = 0; // 记录上一次高度求微分
 float current_vel_mm_s = 0;          // 当前垂直速度
 float base_hover_throttle = 6800.0f; // 基础悬停油门
 #pragma location = 0x28001014
-__no_init uint32 beacon_lost;
+__no_init float data_arr[3];
+// __no_init uint32 beacon_lost;
+// #pragma location = 0x28001018
+// __no_init float car_position[2];
 // uint32 last_beacon_lost = 0;
 
 // PID结构体(先调内环，后调外环)
 PID_Struct pitch_pid = {.Kp = 2.4f, .Ki = 0.00f, .Kd = 0.00f, .out_min = -2000.0f, .out_max = 2000.0f};
 PID_Struct roll_pid = {.Kp = 2.4f, .Ki = 0.00f, .Kd = 0.00f, .out_min = -2000.0f, .out_max = 2000.0f};
-PID_Struct yaw_pid = {.Kp = 0.8f, .Ki = 0.00f, .Kd = 0.00f, .out_min = -500.0f, .out_max = 500.0f};
+PID_Struct yaw_pid = {.Kp = 0.8f, .Ki = 0.00f, .Kd = 0.00f, .out_min = -600.0f, .out_max = 600.0f};
 
 // 定高
 PID_Struct distance_pid = {.Kp = 1.2f, .Ki = 0.0f, .Kd = 0.0004f, .out_min = -1200.0f, .out_max = 1200.0f, .desire = 120.0f};
@@ -81,7 +84,7 @@ PID_Struct velocity_pid = {.Kp = 1.8f, .Ki = 0.02f, .Kd = 0.012f, .out_min = -25
 PID_Struct acc_y_pid = {.Kp = 0.8f, .Ki = 0.00f, .Kd = 0.00f, .out_min = -2000.0f, .out_max = 2000.0f};
 LADRC_1st_Struct gyro_y_adrc = {.b0 = 3.6f, .wo = 88.0f, .wc = 6.8f, .z1 = 0, .z2 = 0}; // 俯仰角速度
 LADRC_1st_Struct gyro_x_adrc = {.b0 = 3.6f, .wo = 98.0f, .wc = 7.2f, .z1 = 0, .z2 = 0}; // 横滚角速度
-LADRC_1st_Struct gyro_z_adrc = {.b0 = 3.6f, .wo = 56.0f, .wc = 4.6f, .z1 = 0, .z2 = 0}; // 偏航角速度
+LADRC_1st_Struct gyro_z_adrc = {.b0 = 3.6f, .wo = 56.0f, .wc = 4.8f, .z1 = 0, .z2 = 0}; // 偏航角速度
 
 // LADRC_1st_Struct *LADRC_p[3] = {&gyro_x_adrc, &gyro_y_adrc, &gyro_z_adrc};
 
@@ -119,14 +122,20 @@ void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
         imu660rc_gyro_y = imu660rc_gyro_y - y_zero;
         imu660rc_gyro_z = imu660rc_gyro_z - z_zero;
 
+        // SCB_CleanInvalidateDCache_by_Addr(&beacon_lost, sizeof(beacon_lost));
+        // SCB_CleanInvalidateDCache_by_Addr(car_position, sizeof(car_position));
+        SCB_CleanInvalidateDCache_by_Addr(data_arr, sizeof(data_arr));
+
         // printf("Data:%d,   %d,   %d\n", imu660rc_gyro_x-x_zero, imu660rc_gyro_y-y_zero, imu660rc_gyro_z-z_zero);
         //  俯仰角
-        pitch_pid.desire = -lora3a22_uart_transfer.joystick[2] / 100;          // 目标值为水平
+        // pitch_pid.desire = -lora3a22_uart_transfer.joystick[2] / 100;          // 目标值为水平
+        pitch_pid.desire = compare_float(data_arr[1] / 10, -5.0f, 5.0f);
         pitch_pid.measure = imu660rc_pitch;                                    // 当前俯仰角
         float gyro_y_meas = (imu660rc_gyro_y / imu660rc_transition_factor[1]); // 当前Y轴角速度
 
         // 横滚角
-        roll_pid.desire = -lora3a22_uart_transfer.joystick[3] / 100;           // 目标值为水平
+        // roll_pid.desire = -lora3a22_uart_transfer.joystick[3] / 100;           // 目标值为水平
+        roll_pid.desire = compare_float((data_arr[2] / 10), -5.0f, 5.0f);
         roll_pid.measure = imu660rc_roll;                                      // 当前横滚角
         float gyro_x_meas = (imu660rc_gyro_x / imu660rc_transition_factor[1]); // 当前X轴角速度
 
@@ -135,34 +144,44 @@ void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
         // yaw_pid.measure = -lora3a22_uart_transfer.joystick[0] / 100;           // 当前偏航角
         // float gyro_z_meas = (imu660rc_gyro_z / imu660rc_transition_factor[1]); // 当前Z轴角速度
 
-        SCB_CleanInvalidateDCache_by_Addr(&beacon_lost, sizeof(beacon_lost));
+
         static float base_search_yaw = 0.0f;
         static uint16 search_timer = 0;
         static uint16 beacon_timer = 0;
+        static uint16 lost_timer = 0;
+        static uint8 search_start = 0;
         static uint8 search_state = 0;
         static uint8 last_beacon_status = 1;
         float target_yaw = base_search_yaw;
 
-        if (beacon_lost == 1) // 识别到了信标
+        if (data_arr[0] == 1) // 识别到了信标
         {
-            beacon_timer++;
+            lost_timer = 0;
+
             if (last_beacon_status == 0) // 上一次是丢失状态
             {
                 beacon_timer = 0;
+                last_beacon_status = 1;
+            }else {
+                beacon_timer++;
+                if (beacon_timer > 100)
+                {
+                    beacon_timer = 0;
+                    base_search_yaw = imu660rc_yaw; // 记录当前偏航角作为基准
+                }
             }
-            if (beacon_timer > 100)
-            {
-                beacon_timer = 0;
-                base_search_yaw = imu660rc_yaw; // 记录当前偏航角作为基准
-            }
-            target_yaw = base_search_yaw;
+
+            target_yaw = imu660rc_yaw;
             // 重置搜索状态，为下一次丢失做准备
             last_beacon_status = 1;
             search_timer = 0;
             search_state = 0;
+            search_start = 0;
         }
-        else if (beacon_lost == 0) // 未识别到信标
+        else if (data_arr[0] == 0) // 未识别到信标
         {
+
+            beacon_timer = 0;
             if (last_beacon_status == 1)
             {
                 // base_search_yaw = imu660rc_yaw;
@@ -170,31 +189,41 @@ void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
 
                 last_beacon_status = 0;
                 search_timer = 0;
+                search_start = 0;
                 search_state = 0;
             }
             else
             {
-                search_timer++; 
-
-                if (search_timer > 1500)
-                {
-                    search_timer = 0;
+                lost_timer++;
+                if(lost_timer > 100){
+                    lost_timer = 0;
+                    search_start = 1;
                     search_state = !search_state;
                 }
+                if(search_start == 1){
+                    search_timer++;
 
-                if (search_state == 0)
-                {
-                    target_yaw = base_search_yaw;
-                }
-                else
-                {
-                    target_yaw = base_search_yaw + 120.0f;
+                    if (search_timer > 1000)
+                    {
+                        search_timer = 0;
+                        search_state = !search_state;
+                    }
+
+                    if (search_state == 0)
+                    {
+                        target_yaw = base_search_yaw;
+                    }
+                    else
+                    {
+                        target_yaw = base_search_yaw + 120.0f;
+                    }
+
+                    if (target_yaw > 180.0f)
+                        target_yaw -= 360.0f;
+                    else if (target_yaw < -180.0f)
+                        target_yaw += 360.0f;
                 }
 
-                if (target_yaw > 180.0f)
-                    target_yaw -= 360.0f;
-                else if (target_yaw < -180.0f)
-                    target_yaw += 360.0f;
             }
         }
 
@@ -211,6 +240,7 @@ void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
         //     yaw_pid.measure -= lora3a22_uart_transfer.joystick[0] / 500.0f; // 累加摇杆量作为目标
         // }
         yaw_pid.measure = target_yaw;
+        // yaw_pid.measure = 0;
 
         // 算出两者的原始差值
         float yaw_diff = yaw_pid.desire - yaw_pid.measure;
@@ -247,7 +277,7 @@ void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
             distance_pid.desire += lora3a22_uart_transfer.joystick[1] / 500;
         }
 
-        distance_pid.desire = compare_float(distance_pid.desire, 1.0f, 1600.0f);
+        distance_pid.desire = compare_float(distance_pid.desire, 1.0f, 1700.0f);
 
         // global_output += lora3a22_uart_transfer.joystick[1]/1000;
 
@@ -277,7 +307,7 @@ void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
 
         // 最终全局油门 = 悬停基准值 + 串级内环的输出补偿量
         global_output = base_hover_throttle + velocity_pid.output;
-        global_output = compare_float(global_output, MIN_DUTY * 100.0f, 95 * 100.0f);
+        global_output = compare_float(global_output, MIN_DUTY * 100.0f, 80 * 100.0f);
 
         // 全局油门低通滤波
         // global_output = 0.6f * global_output + 0.4f * last_global_output;
@@ -397,6 +427,10 @@ void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
         last_filtered_distance_mm = vl53l8cx_distance_mm; // 同步当前高度防起飞突变
         // SCB_CleanInvalidateDCache_by_Addr(&beacon_lost, sizeof(beacon_lost));
         // printf("%d\n" , beacon_lost);
+        // SCB_CleanInvalidateDCache_by_Addr(car_position, sizeof(car_position));
+        // printf("%d, %d\n", car_position[0], car_position[1]);
+        // SCB_CleanInvalidateDCache_by_Addr(data_arr, sizeof(data_arr));
+        // printf("%d, %0.2f, %0.2f\n", (int)data_arr[0], data_arr[1], data_arr[2]);
         if (lora3a22_uart_transfer.switch_key[3] == 1){
             send_uart_motol(1000, // 电机1
                             1000, // 电机2

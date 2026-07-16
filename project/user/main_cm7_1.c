@@ -64,9 +64,12 @@ uint8 image_arr[height][width] = {0};
 bool visited[height][width] = {false};
 uint8 image_copy[height][width];
 #pragma location = 0x28001014
-uint32 beacon_lost = 0;
+float data_arr[3] = {0}; // 0: beacon_lost 1: car_position_x 2: car_position_y
+// uint32 beacon_lost = 0;
+// #pragma location = 0x28001018
+// float car_position[2] = {0};
 
-typedef struct
+    typedef struct
 {
     int area;
     int sum_weight;
@@ -630,16 +633,24 @@ int main(void)
                 car.dir_x = 0;
                 car.dir_y = -1;
             }
+            data_arr[1] = car.cx - MT9V03X_W / 2;
+            data_arr[2] = car.cy - MT9V03X_H / 2;
+        }else
+        {
+            data_arr[1] = 0;
+            data_arr[2] = 0;
         }
 
         if (beacon1.area == 0 && beacon2.area == 0)
         {
-            beacon_lost = 0;
+            data_arr[0] = 0;
         }else
         {
-            beacon_lost = 1;
+            data_arr[0] = 1;
         }
-        SCB_CleanInvalidateDCache_by_Addr(&beacon_lost, sizeof(beacon_lost));
+        SCB_CleanInvalidateDCache_by_Addr(data_arr, sizeof(data_arr));
+        // SCB_CleanInvalidateDCache_by_Addr(&beacon_lost, sizeof(beacon_lost));
+        // SCB_CleanInvalidateDCache_by_Addr(car_position, sizeof(car_position));
 
         float err_fwd = 0.0f, err_lat = 0.0f;
         Blob target_beacon = {0};
