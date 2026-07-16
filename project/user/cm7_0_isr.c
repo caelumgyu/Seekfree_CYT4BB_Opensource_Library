@@ -195,7 +195,7 @@ void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
             else
             {
                 lost_timer++;
-                if(lost_timer > 100){
+                if(lost_timer > 100 && search_start == 0){
                     lost_timer = 0;
                     search_start = 1;
                     search_state = !search_state;
