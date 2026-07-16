@@ -50,7 +50,7 @@
 
 #define THRESH_LOW 80
 #define THRESH_MID 100
-#define THRESH_CAR 200
+#define THRESH_CAR 180
 #define THRESH_HIGH 255
 
 #define WIFI_OPEN 0

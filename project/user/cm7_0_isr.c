@@ -43,10 +43,10 @@
 #include "small_driver_uart_control.h"
 
 bool flow_complete = false;
-bool dir1 = true; // 一般情况下true会让电机顺时针旋转
-bool dir2 = true; // 但是具体情况还要看电机的接线方式，可能需要调整
+bool dir1 = false; // 一般情况下true会让电机顺时针旋转
+bool dir2 = false; // 但是具体情况还要看电机的接线方式，可能需要调整
 bool dir3 = false;  // 这里的电机1因为接线不同导致反转，所以设置为false，其他三个电机接线方式相同，所以设置为true
-bool dir4 = false; // 如果陀螺仪数据与预期的旋转方向相反，可以通过调整这些方向变量来修正
+bool dir4 = true; // 如果陀螺仪数据与预期的旋转方向相反，可以通过调整这些方向变量来修正
 int16_t output_duty1 = 0;
 int16_t output_duty2 = 0;
 int16_t output_duty3 = 0;
@@ -307,7 +307,7 @@ void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
 
         // 最终全局油门 = 悬停基准值 + 串级内环的输出补偿量
         global_output = base_hover_throttle + velocity_pid.output;
-        global_output = compare_float(global_output, MIN_DUTY * 100.0f, 80 * 100.0f);
+        global_output = compare_float(global_output, MIN_DUTY * 100.0f, 85 * 100.0f);
 
         // 全局油门低通滤波
         // global_output = 0.6f * global_output + 0.4f * last_global_output;
