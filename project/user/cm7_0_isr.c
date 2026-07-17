@@ -71,11 +71,11 @@ __no_init float data_arr[3];
 // PID结构体(先调内环，后调外环)
 PID_Struct pitch_pid = {.Kp = 2.4f, .Ki = 0.00f, .Kd = 0.00f, .out_min = -2000.0f, .out_max = 2000.0f};
 PID_Struct roll_pid = {.Kp = 2.4f, .Ki = 0.00f, .Kd = 0.00f, .out_min = -2000.0f, .out_max = 2000.0f};
-PID_Struct yaw_pid = {.Kp = 0.8f, .Ki = 0.00f, .Kd = 0.00f, .out_min = -600.0f, .out_max = 600.0f};
+PID_Struct yaw_pid = {.Kp = 0.8f, .Ki = 0.00f, .Kd = 0.00f, .out_min = -800.0f, .out_max = 800.0f};
 
 // 定高
 PID_Struct distance_pid = {.Kp = 1.2f, .Ki = 0.0f, .Kd = 0.0004f, .out_min = -1200.0f, .out_max = 1200.0f, .desire = 120.0f};
-PID_Struct velocity_pid = {.Kp = 1.8f, .Ki = 0.02f, .Kd = 0.012f, .out_min = -2500.0f, .out_max = 2500.0f};
+PID_Struct velocity_pid = {.Kp = 1.8f, .Ki = 0.02f, .Kd = 0.012f, .out_min = -2700.0f, .out_max = 2700.0f};
 
 // // 定点
 // PID_Struct position_x_pid = {.Kp = 0.0f, .Ki = 0.0f, .Kd = 0.0f, .out_min = -800.0f, .out_max = 800.0f};
@@ -84,7 +84,7 @@ PID_Struct velocity_pid = {.Kp = 1.8f, .Ki = 0.02f, .Kd = 0.012f, .out_min = -25
 PID_Struct acc_y_pid = {.Kp = 0.8f, .Ki = 0.00f, .Kd = 0.00f, .out_min = -2000.0f, .out_max = 2000.0f};
 LADRC_1st_Struct gyro_y_adrc = {.b0 = 3.6f, .wo = 88.0f, .wc = 6.8f, .z1 = 0, .z2 = 0}; // 俯仰角速度
 LADRC_1st_Struct gyro_x_adrc = {.b0 = 3.6f, .wo = 98.0f, .wc = 7.2f, .z1 = 0, .z2 = 0}; // 横滚角速度
-LADRC_1st_Struct gyro_z_adrc = {.b0 = 3.6f, .wo = 56.0f, .wc = 4.8f, .z1 = 0, .z2 = 0}; // 偏航角速度
+LADRC_1st_Struct gyro_z_adrc = {.b0 = 3.6f, .wo = 58.0f, .wc = 4.8f, .z1 = 0, .z2 = 0}; // 偏航角速度
 
 // LADRC_1st_Struct *LADRC_p[3] = {&gyro_x_adrc, &gyro_y_adrc, &gyro_z_adrc};
 
@@ -203,7 +203,7 @@ void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
                 if(search_start == 1){
                     search_timer++;
 
-                    if (search_timer > 1000)
+                    if (search_timer > 1200)
                     {
                         search_timer = 0;
                         search_state = !search_state;
@@ -277,7 +277,7 @@ void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
             distance_pid.desire += lora3a22_uart_transfer.joystick[1] / 500;
         }
 
-        distance_pid.desire = compare_float(distance_pid.desire, 1.0f, 1700.0f);
+        distance_pid.desire = compare_float(distance_pid.desire, -500.0f, 1700.0f);
 
         // global_output += lora3a22_uart_transfer.joystick[1]/1000;
 
@@ -307,7 +307,7 @@ void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
 
         // 最终全局油门 = 悬停基准值 + 串级内环的输出补偿量
         global_output = base_hover_throttle + velocity_pid.output;
-        global_output = compare_float(global_output, MIN_DUTY * 100.0f, 85 * 100.0f);
+        global_output = compare_float(global_output, MIN_DUTY * 100.0f, 95 * 100.0f);
 
         // 全局油门低通滤波
         // global_output = 0.6f * global_output + 0.4f * last_global_output;
