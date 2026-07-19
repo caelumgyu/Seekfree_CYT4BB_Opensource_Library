@@ -44,9 +44,9 @@
 
 bool flow_complete = false;
 bool dir1 = false; // 一般情况下true会让电机顺时针旋转
-bool dir2 = false; // 但是具体情况还要看电机的接线方式，可能需要调整
-bool dir3 = false;  // 这里的电机1因为接线不同导致反转，所以设置为false，其他三个电机接线方式相同，所以设置为true
-bool dir4 = true; // 如果陀螺仪数据与预期的旋转方向相反，可以通过调整这些方向变量来修正
+bool dir2 = true;  // 但是具体情况还要看电机的接线方式，可能需要调整
+bool dir3 = false; // 这里的电机1因为接线不同导致反转，所以设置为false，其他三个电机接线方式相同，所以设置为true
+bool dir4 = false; // 如果陀螺仪数据与预期的旋转方向相反，可以通过调整这些方向变量来修正
 int16_t output_duty1 = 0;
 int16_t output_duty2 = 0;
 int16_t output_duty3 = 0;
@@ -77,9 +77,9 @@ PID_Struct yaw_pid = {.Kp = 0.8f, .Ki = 0.00f, .Kd = 0.00f, .out_min = -800.0f, 
 PID_Struct distance_pid = {.Kp = 1.2f, .Ki = 0.0f, .Kd = 0.0004f, .out_min = -1200.0f, .out_max = 1200.0f, .desire = 120.0f};
 PID_Struct velocity_pid = {.Kp = 1.8f, .Ki = 0.02f, .Kd = 0.012f, .out_min = -2700.0f, .out_max = 2700.0f};
 
-// // 定点
-// PID_Struct position_x_pid = {.Kp = 0.0f, .Ki = 0.0f, .Kd = 0.0f, .out_min = -800.0f, .out_max = 800.0f};
-// PID_Struct position_y_pid = {.Kp = 0.0f, .Ki = 0.0f, .Kd = 0.0f, .out_min = -800.0f, .out_max = 800.0f};
+// 跟车
+PID_Struct position_x_pid = {.Kp = 0.1f, .Ki = 0.0f, .Kd = 0.00001f, .out_min = -5.0f, .out_max = 5.0f};
+PID_Struct position_y_pid = {.Kp = 0.1f, .Ki = 0.0f, .Kd = 0.00001f, .out_min = -5.0f, .out_max = 5.0f};
 
 PID_Struct acc_y_pid = {.Kp = 0.8f, .Ki = 0.00f, .Kd = 0.00f, .out_min = -2000.0f, .out_max = 2000.0f};
 LADRC_1st_Struct gyro_y_adrc = {.b0 = 3.6f, .wo = 88.0f, .wc = 6.8f, .z1 = 0, .z2 = 0}; // 俯仰角速度
@@ -99,7 +99,7 @@ void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
     if (lora3a22_uart_transfer.switch_key[1] == 1)
     {
         imu660rc_get_gyro();
-        imu660rc_get_acc(); 
+        imu660rc_get_acc();
 
         // vl53l8cx_get_data();
         // vl53l8cx_get_center_distance(&dist); // 获取中心区域平均距离
@@ -126,16 +126,25 @@ void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
         // SCB_CleanInvalidateDCache_by_Addr(car_position, sizeof(car_position));
         SCB_CleanInvalidateDCache_by_Addr(data_arr, sizeof(data_arr));
 
+        position_x_pid.desire = data_arr[1];
+        position_x_pid.measure = 0;
+        position_y_pid.desire = data_arr[2];
+        position_y_pid.measure = 0;
+        PID_Calc(&position_x_pid);
+        PID_Calc(&position_y_pid);
+
         // printf("Data:%d,   %d,   %d\n", imu660rc_gyro_x-x_zero, imu660rc_gyro_y-y_zero, imu660rc_gyro_z-z_zero);
         //  俯仰角
-        // pitch_pid.desire = -lora3a22_uart_transfer.joystick[2] / 100;          // 目标值为水平
-        pitch_pid.desire = compare_float(data_arr[1] / 10, -5.0f, 5.0f);
+        // pitch_pid.desire = position_x_pid.output;
+        pitch_pid.desire = -lora3a22_uart_transfer.joystick[2] / 100;          // 目标值为水平
+        // pitch_pid.desire = compare_float(data_arr[1] / 10, -3.0f, 3.0f);
         pitch_pid.measure = imu660rc_pitch;                                    // 当前俯仰角
         float gyro_y_meas = (imu660rc_gyro_y / imu660rc_transition_factor[1]); // 当前Y轴角速度
 
         // 横滚角
-        // roll_pid.desire = -lora3a22_uart_transfer.joystick[3] / 100;           // 目标值为水平
-        roll_pid.desire = compare_float((data_arr[2] / 10), -5.0f, 5.0f);
+        // roll_pid.desire = position_y_pid.output;
+        roll_pid.desire = -lora3a22_uart_transfer.joystick[3] / 100;           // 目标值为水平
+        // roll_pid.desire = compare_float((data_arr[2] / 10), -3.0f, 3.0f);
         roll_pid.measure = imu660rc_roll;                                      // 当前横滚角
         float gyro_x_meas = (imu660rc_gyro_x / imu660rc_transition_factor[1]); // 当前X轴角速度
 
@@ -144,25 +153,32 @@ void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
         // yaw_pid.measure = -lora3a22_uart_transfer.joystick[0] / 100;           // 当前偏航角
         // float gyro_z_meas = (imu660rc_gyro_z / imu660rc_transition_factor[1]); // 当前Z轴角速度
 
-
         static float base_search_yaw = 0.0f;
         static uint16 search_timer = 0;
         static uint16 beacon_timer = 0;
         static uint16 lost_timer = 0;
+        static uint16 land_timer = 0;
         static uint8 search_start = 0;
         static uint8 search_state = 0;
         static uint8 last_beacon_status = 1;
+        static uint8 land_start = 0;
         float target_yaw = base_search_yaw;
 
         if (data_arr[0] == 1) // 识别到了信标
         {
             lost_timer = 0;
+            if (beacon_timer > 200){ // 防止将小车突然被识别成灯板(留大概5帧
+                land_timer = 0;
+            }
+  
 
             if (last_beacon_status == 0) // 上一次是丢失状态
             {
                 beacon_timer = 0;
                 last_beacon_status = 1;
-            }else {
+            }
+            else
+            {
                 beacon_timer++;
                 if (beacon_timer > 100)
                 {
@@ -186,7 +202,12 @@ void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
             {
                 // base_search_yaw = imu660rc_yaw;
                 // target_yaw = base_search_yaw;
-
+                // 粗略计算灭灯次数
+                land_start += 1;
+                if (land_start > 10)
+                {
+                    land_start = 10;
+                }
                 last_beacon_status = 0;
                 search_timer = 0;
                 search_start = 0;
@@ -194,13 +215,23 @@ void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
             }
             else
             {
+                if (land_start == 10)
+                {
+                    land_timer++;
+                }
+                if (land_timer > 10000)
+                {
+                    goto land;
+                }
                 lost_timer++;
-                if(lost_timer > 100 && search_start == 0){
+                if (lost_timer > 100 && search_start == 0)
+                {
                     lost_timer = 0;
                     search_start = 1;
                     search_state = !search_state;
                 }
-                if(search_start == 1){
+                if (search_start == 1)
+                {
                     search_timer++;
 
                     if (search_timer > 1200)
@@ -223,10 +254,8 @@ void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
                     else if (target_yaw < -180.0f)
                         target_yaw += 360.0f;
                 }
-
             }
         }
-
         // 偏航角
         yaw_pid.desire = imu660rc_yaw; // 当前IMU偏航角 (-180到180)
         // static uint8 yaw_count = 0;
@@ -262,7 +291,7 @@ void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
 
         // 垂直方向速度和滤波
         float raw_vel_mm_s = (filtered_gyro_distance_mm - last_filtered_distance_mm) / (TIME_DELAY * 50); // tof频率是50hz
-        current_vel_mm_s = 0.8f * raw_vel_mm_s + 0.2f * current_vel_mm_s;                             // 权重0.2抗噪声
+        current_vel_mm_s = 0.8f * raw_vel_mm_s + 0.2f * current_vel_mm_s;                                 // 权重0.2抗噪声
         last_filtered_distance_mm = filtered_gyro_distance_mm;
 
         // 一毫秒累加一次
@@ -298,11 +327,11 @@ void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
         }
         else
         {
-            
+
             distance_pid.measure = distance_pid.desire;
         }
         // distance_pid.measure = filtered_gyro_distance_mm; // 外环测量值
-        velocity_pid.measure = current_vel_mm_s;     // 内环测量值
+        velocity_pid.measure = current_vel_mm_s; // 内环测量值
         PID_Calc_chain(&distance_pid, &velocity_pid);
 
         // 最终全局油门 = 悬停基准值 + 串级内环的输出补偿量
@@ -393,6 +422,179 @@ void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
                             global_output  // 电机4
             );
         }
+
+        if (0)
+        {
+        land:
+            // static uint16 land_count = 0;
+            //  俯仰角
+            // pitch_pid.desire = -lora3a22_uart_transfer.joystick[2] / 100;          // 目标值为水平
+            pitch_pid.desire = compare_float(data_arr[1] / 10, -3.0f, 3.0f);
+            pitch_pid.measure = imu660rc_pitch;                                    // 当前俯仰角
+            float gyro_y_meas = (imu660rc_gyro_y / imu660rc_transition_factor[1]); // 当前Y轴角速度
+
+            // 横滚角
+            // roll_pid.desire = -lora3a22_uart_transfer.joystick[3] / 100;           // 目标值为水平
+            roll_pid.desire = -compare_float((data_arr[2] / 10), -3.0f, 3.0f);
+            roll_pid.measure = imu660rc_roll;                                      // 当前横滚角
+            float gyro_x_meas = (imu660rc_gyro_x / imu660rc_transition_factor[1]); // 当前X轴角速度
+
+            yaw_pid.desire = imu660rc_yaw;
+            yaw_pid.measure = 0;
+            // 算出两者的原始差值
+            float yaw_diff = yaw_pid.desire - yaw_pid.measure;
+
+            if (yaw_diff > 180.0f)
+            {
+                yaw_pid.measure += 360.0f;
+            }
+            else if (yaw_diff < -180.0f)
+            {
+                yaw_pid.measure -= 360.0f;
+            }
+
+            float gyro_z_meas = (imu660rc_gyro_z / imu660rc_transition_factor[1]); // 当前Z轴角速度
+
+            // 距离
+            static float filtered_gyro_distance_mm = 0;
+            filtered_gyro_distance_mm = cosf(PI / 180 * imu660rc_roll) * filtered_distance_mm * cosf(PI / 180 * imu660rc_pitch); // 根据姿态调整距离测量值
+
+            // 垂直方向速度和滤波
+            float raw_vel_mm_s = (filtered_gyro_distance_mm - last_filtered_distance_mm) / (TIME_DELAY * 50); // tof频率是50hz
+            current_vel_mm_s = 0.8f * raw_vel_mm_s + 0.2f * current_vel_mm_s;                                 // 权重0.2抗噪声
+            last_filtered_distance_mm = filtered_gyro_distance_mm;
+
+            // 一毫秒累加一次
+            static uint8 distance_count = 0;
+            if (distance_count < 15)
+            {
+                distance_count++;
+            }
+            else if (distance_count >= 15)
+            {
+                distance_count = 0;
+                // distance_pid.desire += lora3a22_uart_transfer.joystick[1] / 500;
+                distance_pid.desire -= 2;
+            }
+
+            distance_pid.desire = compare_float(distance_pid.desire, -500.0f, 1700.0f);
+
+            // global_output += lora3a22_uart_transfer.joystick[1]/1000;
+
+            // 外环使用P控制
+            PID_Calc(&pitch_pid);
+            PID_Calc(&roll_pid);
+            PID_Calc(&yaw_pid);
+
+            float err_distance = distance_pid.desire - filtered_gyro_distance_mm; // 计算原始误差
+
+            if (err_distance > 20.0f)
+            {
+                distance_pid.measure = distance_pid.desire - (err_distance - 20.0f);
+            }
+            else if (err_distance < -20.0f)
+            {
+                distance_pid.measure = distance_pid.desire - (err_distance + 20.0f);
+            }
+            else
+            {
+
+                distance_pid.measure = distance_pid.desire;
+            }
+            // distance_pid.measure = filtered_gyro_distance_mm; // 外环测量值
+            velocity_pid.measure = current_vel_mm_s; // 内环测量值
+            PID_Calc_chain(&distance_pid, &velocity_pid);
+
+            // 最终全局油门 = 悬停基准值 + 串级内环的输出补偿量
+            global_output = base_hover_throttle + velocity_pid.output;
+            global_output = compare_float(global_output, MIN_DUTY * 100.0f, 95 * 100.0f);
+
+            // 全局油门低通滤波
+            // global_output = 0.6f * global_output + 0.4f * last_global_output;
+            // last_global_output = global_output;
+            // global_output =1000;
+
+            // 作用给电机
+            // 三者为叠加关系 (根据陀螺仪和四旋翼的方位关系来调整)
+            //   电机1 =  俯仰角PID输出 + 横滚角PID输出 + 偏航角PID输出
+            //   电机2 =  俯仰角PID输出 - 横滚角PID输出 - 偏航角PID输出
+            //   电机3 = -俯仰角PID输出 + 横滚角PID输出 - 偏航角PID输出
+            //   电机4 = -俯仰角PID输出 - 横滚角PID输出 + 偏航角PID输出
+            //   逆时针1111********2222顺时针
+            //         1111********2222
+            //         ****************
+            //         ****************
+            //   顺时针3333********4444逆时针
+            //         3333********4444
+
+            // send_uart_motol(global_output + out_pitch + out_roll + out_yaw, // 电机1
+            //                 global_output + out_pitch - out_roll - out_yaw, // 电机2
+            //                 global_output - out_pitch + out_roll - out_yaw, // 电机3
+            //                 global_output - out_pitch - out_roll + out_yaw  // 电机4
+            // );
+
+            // send_uart_motol(global_output - out_roll - out_pitch, // 电机1
+            //                 global_output - out_roll + out_pitch, // 电机2
+            //                 global_output + out_roll - out_pitch, // 电机3
+            //                 global_output + out_roll + out_pitch  // 电机4
+            // );
+
+            if (vl53l8cx_distance_mm >= 120 /*|| lora3a22_uart_transfer.switch_key[2] == 1*/)
+            {
+                // LADRC_1st_Update(adrc结构体, 期望值, 实际值, 周期时间)gyro_z_meas
+                LADRC_1st_Update(&gyro_y_adrc, pitch_pid.output, gyro_y_meas, TIME_DELAY, MAX_DUTY);
+                LADRC_1st_Update(&gyro_x_adrc, roll_pid.output, gyro_x_meas, TIME_DELAY, MAX_DUTY);
+                LADRC_1st_Update(&gyro_z_adrc, yaw_pid.output, gyro_z_meas, TIME_DELAY, 20);
+
+                out_pitch = compare_float(gyro_y_adrc.u, -MAX_DUTY * 100.0f, MAX_DUTY * 100.0f);
+                out_roll = compare_float(gyro_x_adrc.u, -MAX_DUTY * 100.0f, MAX_DUTY * 100.0f);
+                out_yaw = compare_float(gyro_z_adrc.u, -20 * 100.0f, 20 * 100.0f);
+
+                // typedef struct
+                // {
+                //     uint8 head;      // 帧头
+                //     uint8 device_id; // 设备id
+
+                //     int16 upflow302_x;    // 光流_x
+                //     int16 upflow302_y;    // 光流_y
+                //     int16 upflow302_us;   // 光流_时间差
+                //     int16 upflow302_us_a; // 预留位
+
+                //     uint8 upflow302_valid;   // 光流_状态 0不可用  245  可用
+                //     uint8 upflow302_version; // 光流_版本号
+
+                //     uint8 sum_check; // 和校验
+                //     uint8 sum_end;   // 和校验
+
+                // } upflow302_receive_struct;
+                // 等待光流稳定
+
+                // send_uart_motol(global_output - out_roll - out_pitch - out_yaw, // 电机1  成品
+                //                 global_output - out_roll + out_pitch + out_yaw, // 电机2
+                //                 global_output + out_roll - out_pitch + out_yaw, // 电机3
+                //                 global_output + out_roll + out_pitch - out_yaw  // 电机4
+                // );
+                // send_uart_motol(global_output + out_roll + out_pitch - out_yaw, // 电机1  自制
+                //                 global_output - out_roll + out_pitch + out_yaw, // 电机2
+                //                 global_output - out_roll - out_pitch - out_yaw, // 电机3
+                //                 global_output + out_roll - out_pitch + out_yaw  // 电机4
+                // );
+                send_uart_motol(global_output + out_roll - out_pitch + out_yaw, // 电机1  当前
+                                global_output - out_roll - out_pitch - out_yaw, // 电机2
+                                global_output + out_roll + out_pitch - out_yaw, // 电机3
+                                global_output - out_roll + out_pitch + out_yaw  // 电机4
+                );
+            }
+            else /* if (dl1a_distance_mm < 150 && lora3a22_uart_transfer.switch_key[2] == 0)*/
+            {
+                send_uart_motol(0, // 电机1
+                                0, // 电机2
+                                0, // 电机3
+                                0  // 电机4
+                );
+            }
+        }
+
     }
     else if (lora3a22_uart_transfer.switch_key[1] == 0)
     {
@@ -431,11 +633,12 @@ void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
         // printf("%d, %d\n", car_position[0], car_position[1]);
         // SCB_CleanInvalidateDCache_by_Addr(data_arr, sizeof(data_arr));
         // printf("%d, %0.2f, %0.2f\n", (int)data_arr[0], data_arr[1], data_arr[2]);
-        if (lora3a22_uart_transfer.switch_key[3] == 1){
-            send_uart_motol(1000, // 电机1
-                            1000, // 电机2
-                            1000, // 电机3
-                            1000  // 电机4
+        if (lora3a22_uart_transfer.switch_key[3] == 1)
+        {
+            send_uart_motol(2000, // 电机1
+                            2000, // 电机2
+                            2000, // 电机3
+                            2000  // 电机4
             );
         }
     }
@@ -446,8 +649,8 @@ void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
 void pit0_ch1_isr() // 定时器通道 1 周期中断服务函数
 {
     pit_isr_flag_clear(PIT_CH1);
-    //dl1a_get_distance();
-    // vl53l8cx_get_distance();
+    // dl1a_get_distance();
+    //  vl53l8cx_get_distance();
 
     // upflow302_receive_callback();
 }
