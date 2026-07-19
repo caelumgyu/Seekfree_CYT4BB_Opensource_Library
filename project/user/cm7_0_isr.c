@@ -219,7 +219,7 @@ void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
                 {
                     land_timer++;
                 }
-                if (land_timer > 10000)
+                if (land_timer > 8000)
                 {
                     goto land;
                 }
