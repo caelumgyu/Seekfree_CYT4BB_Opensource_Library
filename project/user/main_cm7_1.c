@@ -614,9 +614,16 @@ int main(void)
                 tracker2 = temp_t;
             }
         }
-
+        static uint16 car_lost_timer = 0;
+        static uint8 car_real_lost = 0;
+        static float last_car_dir_x = 0;
+        static float last_car_dir_y = -1;
+        static float last_car_cx = 0;
+        static float last_car_cy = 0;
         if (car.area > 0)
         {
+            car_real_lost = 0;
+            car_lost_timer = 0;
             calculate_pca(&car);
 
             filtered_car_dir_x = alpha * car.dir_x + (1.0f - alpha) * filtered_car_dir_x;
@@ -627,16 +634,29 @@ int main(void)
             {
                 car.dir_x = filtered_car_dir_x / len;
                 car.dir_y = filtered_car_dir_y / len;
+                last_car_dir_x = car.dir_x;
+                last_car_dir_y = car.dir_y;
+                last_car_cx = car.cx;
+                last_car_cy = car.cy;
             }
             else
             {
                 car.dir_x = 0;
                 car.dir_y = -1;
+                last_car_dir_x = car.dir_x;
+                last_car_dir_y = car.dir_y;
             }
             data_arr[1] = car.cx - MT9V03X_W / 2;
             data_arr[2] = car.cy - MT9V03X_H / 2;
         }else
         {
+            car_lost_timer++;
+            if (car_lost_timer > 200)   //小车识别丢失防抖
+            {
+                car_lost_timer = 0;
+
+                car_real_lost = 1;
+            }
             data_arr[1] = 0;
             data_arr[2] = 0;
         }
@@ -679,7 +699,17 @@ int main(void)
             err_fwd = vec_x * car.dir_x + vec_y * car.dir_y;
             err_lat = vec_x * right_x + vec_y * right_y;
         }
-        sprintf(car_dat, "%0.1f,%0.1f\n", err_fwd, err_lat);
+        else if (target_beacon.area > 0 && car.area == 0 && car_real_lost == 0)
+        {
+            float vec_x = target_beacon.cx - last_car_cx;
+            float vec_y = target_beacon.cy - last_car_cy;
+
+            float right_x = last_car_dir_y;
+            float right_y = -last_car_dir_x;
+            err_fwd = vec_x * last_car_dir_x + vec_y * last_car_dir_y;
+            err_lat = vec_x * right_x + vec_y * right_y;
+        }
+            sprintf(car_dat, "%0.1f,%0.1f\n", err_fwd, err_lat);
         // printf("%s  ,  %0.2f,   %0.2f\n",car_dat,beacon1.cx,beacon1.cy);
         uart_write_string(UART_4, car_dat);
 
