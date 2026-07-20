@@ -82,9 +82,9 @@ PID_Struct position_x_pid = {.Kp = 0.1f, .Ki = 0.0f, .Kd = 0.00001f, .out_min = 
 PID_Struct position_y_pid = {.Kp = 0.1f, .Ki = 0.0f, .Kd = 0.00001f, .out_min = -5.0f, .out_max = 5.0f};
 
 PID_Struct acc_y_pid = {.Kp = 0.8f, .Ki = 0.00f, .Kd = 0.00f, .out_min = -2000.0f, .out_max = 2000.0f};
-LADRC_1st_Struct gyro_y_adrc = {.b0 = 3.6f, .wo = 88.0f, .wc = 6.8f, .z1 = 0, .z2 = 0}; // 俯仰角速度
-LADRC_1st_Struct gyro_x_adrc = {.b0 = 3.6f, .wo = 98.0f, .wc = 7.2f, .z1 = 0, .z2 = 0}; // 横滚角速度
-LADRC_1st_Struct gyro_z_adrc = {.b0 = 3.6f, .wo = 58.0f, .wc = 4.8f, .z1 = 0, .z2 = 0}; // 偏航角速度
+LADRC_1st_Struct gyro_y_adrc = {.b0 = 3.8f, .wo = 88.0f, .wc = 6.8f, .z1 = 0, .z2 = 0}; // 俯仰角速度
+LADRC_1st_Struct gyro_x_adrc = {.b0 = 3.8f, .wo = 98.0f, .wc = 7.2f, .z1 = 0, .z2 = 0}; // 横滚角速度
+LADRC_1st_Struct gyro_z_adrc = {.b0 = 3.8f, .wo = 58.0f, .wc = 4.8f, .z1 = 0, .z2 = 0}; // 偏航角速度
 
 // LADRC_1st_Struct *LADRC_p[3] = {&gyro_x_adrc, &gyro_y_adrc, &gyro_z_adrc};
 
@@ -156,6 +156,7 @@ void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
         static float base_search_yaw = 0.0f;
         static uint16 search_timer = 0;
         static uint16 beacon_timer = 0;
+        static uint16 beacon_real_loast = 0;
         static uint16 lost_timer = 0;
         static uint16 land_timer = 0;
         static uint8 search_start = 0;
@@ -167,18 +168,20 @@ void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
         if (data_arr[0] == 1) // 识别到了信标
         {
             lost_timer = 0;
-            if (beacon_timer > 200){ // 防止将小车突然被识别成灯板(留大概5帧
+            if (beacon_real_loast > 200)
+            { // 防止将小车突然被识别成灯板(留大概5帧
                 land_timer = 0;
             }
-  
 
             if (last_beacon_status == 0) // 上一次是丢失状态
             {
+                beacon_real_loast = 0;
                 beacon_timer = 0;
                 last_beacon_status = 1;
             }
             else
             {
+                beacon_real_loast++;
                 beacon_timer++;
                 if (beacon_timer > 100)
                 {
@@ -196,7 +199,7 @@ void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
         }
         else if (data_arr[0] == 0) // 未识别到信标
         {
-
+            beacon_real_loast = 0;
             beacon_timer = 0;
             if (last_beacon_status == 1)
             {
