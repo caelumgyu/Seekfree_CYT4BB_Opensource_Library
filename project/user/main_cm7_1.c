@@ -64,7 +64,7 @@ uint8 image_arr[height][width] = {0};
 bool visited[height][width] = {false};
 uint8 image_copy[height][width];
 #pragma location = 0x28001014
-float data_arr[3] = {0}; // 0: beacon_lost 1: car_position_x 2: car_position_y
+float data_arr[4] = {0}; // 0: beacon_lost 1: car_position_x 2: car_position_y 3: land_start
 // uint32 beacon_lost = 0;
 // #pragma location = 0x28001018
 // float car_position[2] = {0};
@@ -651,7 +651,7 @@ int main(void)
         }else
         {
             car_lost_timer++;
-            if (car_lost_timer > 200)   //小车识别丢失防抖
+            if (car_lost_timer > 100)   //小车识别丢失防抖
             {
                 car_lost_timer = 0;
 
@@ -674,6 +674,7 @@ int main(void)
 
         float err_fwd = 0.0f, err_lat = 0.0f;
         Blob target_beacon = {0};
+        Blob other_beacon = {0};
         if (beacon1.area > 0 && beacon2.area > 0 && car.area > 0)
         {
             float dist1 = (beacon1.cx - car.cx) * (beacon1.cx - car.cx) + (beacon1.cy - car.cy) * (beacon1.cy - car.cy);
@@ -683,10 +684,12 @@ int main(void)
         else if (beacon1.area > 0)
         {
             target_beacon = beacon1;
+            other_beacon = beacon2;
         }
         else if (beacon2.area > 0)
         {
             target_beacon = beacon2;
+            other_beacon = beacon1;
         }
 
         if (target_beacon.area > 0 && car.area > 0)
@@ -709,9 +712,13 @@ int main(void)
             err_fwd = vec_x * last_car_dir_x + vec_y * last_car_dir_y;
             err_lat = vec_x * right_x + vec_y * right_y;
         }
+        if (data_arr[3] < 10)
+        {
             sprintf(car_dat, "%0.1f,%0.1f\n", err_fwd, err_lat);
-        // printf("%s  ,  %0.2f,   %0.2f\n",car_dat,beacon1.cx,beacon1.cy);
-        uart_write_string(UART_4, car_dat);
+            // printf("%s  ,  %0.2f,   %0.2f\n",car_dat,beacon1.cx,beacon1.cy);
+            uart_write_string(UART_4, car_dat);
+        }
+
 
 
 #if WIFI_OPEN

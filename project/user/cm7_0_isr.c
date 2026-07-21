@@ -62,7 +62,7 @@ float last_filtered_distance_mm = 0; // 记录上一次高度求微分
 float current_vel_mm_s = 0;          // 当前垂直速度
 float base_hover_throttle = 6800.0f; // 基础悬停油门
 #pragma location = 0x28001014
-__no_init float data_arr[3];
+__no_init float data_arr[4];
 // __no_init uint32 beacon_lost;
 // #pragma location = 0x28001018
 // __no_init float car_position[2];
@@ -84,7 +84,7 @@ PID_Struct position_y_pid = {.Kp = 0.1f, .Ki = 0.0f, .Kd = 0.00001f, .out_min = 
 PID_Struct acc_y_pid = {.Kp = 0.8f, .Ki = 0.00f, .Kd = 0.00f, .out_min = -2000.0f, .out_max = 2000.0f};
 LADRC_1st_Struct gyro_y_adrc = {.b0 = 3.8f, .wo = 88.0f, .wc = 6.8f, .z1 = 0, .z2 = 0}; // 俯仰角速度
 LADRC_1st_Struct gyro_x_adrc = {.b0 = 3.8f, .wo = 98.0f, .wc = 7.2f, .z1 = 0, .z2 = 0}; // 横滚角速度
-LADRC_1st_Struct gyro_z_adrc = {.b0 = 3.8f, .wo = 58.0f, .wc = 4.8f, .z1 = 0, .z2 = 0}; // 偏航角速度
+LADRC_1st_Struct gyro_z_adrc = {.b0 = 3.2f, .wo = 58.0f, .wc = 4.8f, .z1 = 0, .z2 = 0}; // 偏航角速度
 
 // LADRC_1st_Struct *LADRC_p[3] = {&gyro_x_adrc, &gyro_y_adrc, &gyro_z_adrc};
 
@@ -164,9 +164,9 @@ void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
         static uint8 last_beacon_status = 1;
         static uint8 land_start = 0;
         float target_yaw = base_search_yaw;
-
         if (land_timer > 8000)
         {
+            data_arr[3] = land_start;
             goto land;
         }
 
@@ -239,7 +239,7 @@ void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
                 {
                     search_timer++;
 
-                    if (search_timer > 1200)
+                    if (search_timer > 1500)
                     {
                         search_timer = 0;
                         search_state = !search_state;
@@ -296,7 +296,7 @@ void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
 
         // 垂直方向速度和滤波
         float raw_vel_mm_s = (filtered_gyro_distance_mm - last_filtered_distance_mm) / (TIME_DELAY * 50); // tof频率是50hz
-        current_vel_mm_s = 0.8f * raw_vel_mm_s + 0.2f * current_vel_mm_s;                                 // 权重0.2抗噪声
+        current_vel_mm_s = 0.8f * raw_vel_mm_s + 0.2f * current_vel_mm_s;
         last_filtered_distance_mm = filtered_gyro_distance_mm;
 
         // 一毫秒累加一次
@@ -311,7 +311,7 @@ void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
             distance_pid.desire += lora3a22_uart_transfer.joystick[1] / 500;
         }
 
-        distance_pid.desire = compare_float(distance_pid.desire, -500.0f, 1700.0f);
+        distance_pid.desire = compare_float(distance_pid.desire, -600.0f, 1700.0f);
 
         // global_output += lora3a22_uart_transfer.joystick[1]/1000;
 
@@ -466,7 +466,7 @@ void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
 
             // 垂直方向速度和滤波
             float raw_vel_mm_s = (filtered_gyro_distance_mm - last_filtered_distance_mm) / (TIME_DELAY * 50); // tof频率是50hz
-            current_vel_mm_s = 0.8f * raw_vel_mm_s + 0.2f * current_vel_mm_s;                                 // 权重0.2抗噪声
+            current_vel_mm_s = 0.8f * raw_vel_mm_s + 0.2f * current_vel_mm_s;
             last_filtered_distance_mm = filtered_gyro_distance_mm;
 
             // 一毫秒累加一次
@@ -479,10 +479,10 @@ void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
             {
                 distance_count = 0;
                 // distance_pid.desire += lora3a22_uart_transfer.joystick[1] / 500;
-                distance_pid.desire -= 2;
+                distance_pid.desire -= 2.4;
             }
 
-            distance_pid.desire = compare_float(distance_pid.desire, -500.0f, 1700.0f);
+            distance_pid.desire = compare_float(distance_pid.desire, -600.0f, 1700.0f);
 
             // global_output += lora3a22_uart_transfer.joystick[1]/1000;
 
@@ -544,7 +544,7 @@ void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
             //                 global_output + out_roll + out_pitch  // 电机4
             // );
 
-            if (vl53l8cx_distance_mm >= 120 /*|| lora3a22_uart_transfer.switch_key[2] == 1*/)
+            if (vl53l8cx_distance_mm >= 150 /*|| lora3a22_uart_transfer.switch_key[2] == 1*/)
             {
                 // LADRC_1st_Update(adrc结构体, 期望值, 实际值, 周期时间)gyro_z_meas
                 LADRC_1st_Update(&gyro_y_adrc, pitch_pid.output, gyro_y_meas, TIME_DELAY, MAX_DUTY);
