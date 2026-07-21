@@ -165,6 +165,11 @@ void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
         static uint8 land_start = 0;
         float target_yaw = base_search_yaw;
 
+        if (land_timer > 8000)
+        {
+            goto land;
+        }
+
         if (data_arr[0] == 1) // 识别到了信标
         {
             lost_timer = 0;
@@ -222,10 +227,7 @@ void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
                 {
                     land_timer++;
                 }
-                if (land_timer > 8000)
-                {
-                    goto land;
-                }
+
                 lost_timer++;
                 if (lost_timer > 100 && search_start == 0)
                 {
