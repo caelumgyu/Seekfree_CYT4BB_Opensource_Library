@@ -78,8 +78,8 @@ PID_Struct distance_pid = {.Kp = 1.2f, .Ki = 0.0f, .Kd = 0.0004f, .out_min = -12
 PID_Struct velocity_pid = {.Kp = 1.8f, .Ki = 0.02f, .Kd = 0.012f, .out_min = -2700.0f, .out_max = 2700.0f};
 
 // 跟车
-PID_Struct position_x_pid = {.Kp = 0.1f, .Ki = 0.0f, .Kd = 0.00001f, .out_min = -5.0f, .out_max = 5.0f};
-PID_Struct position_y_pid = {.Kp = 0.1f, .Ki = 0.0f, .Kd = 0.00001f, .out_min = -5.0f, .out_max = 5.0f};
+PID_Struct position_x_pid = {.Kp = 0.024f, .Ki = 0.0f, .Kd = 0.000005f, .out_min = -5.0f, .out_max = 5.0f};
+PID_Struct position_y_pid = {.Kp = 0.024f, .Ki = 0.0f, .Kd = 0.000005f, .out_min = -5.0f, .out_max = 5.0f};
 
 PID_Struct acc_y_pid = {.Kp = 0.8f, .Ki = 0.00f, .Kd = 0.00f, .out_min = -2000.0f, .out_max = 2000.0f};
 LADRC_1st_Struct gyro_y_adrc = {.b0 = 3.8f, .wo = 88.0f, .wc = 6.8f, .z1 = 0, .z2 = 0}; // 俯仰角速度
@@ -135,15 +135,15 @@ void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
 
         // printf("Data:%d,   %d,   %d\n", imu660rc_gyro_x-x_zero, imu660rc_gyro_y-y_zero, imu660rc_gyro_z-z_zero);
         //  俯仰角
-        // pitch_pid.desire = position_x_pid.output;
-        pitch_pid.desire = -lora3a22_uart_transfer.joystick[2] / 100;          // 目标值为水平
+        pitch_pid.desire = position_x_pid.output;
+        // pitch_pid.desire = -lora3a22_uart_transfer.joystick[2] / 100;          // 目标值为水平
         // pitch_pid.desire = compare_float(data_arr[1] / 10, -3.0f, 3.0f);
         pitch_pid.measure = imu660rc_pitch;                                    // 当前俯仰角
         float gyro_y_meas = (imu660rc_gyro_y / imu660rc_transition_factor[1]); // 当前Y轴角速度
 
         // 横滚角
-        // roll_pid.desire = position_y_pid.output;
-        roll_pid.desire = -lora3a22_uart_transfer.joystick[3] / 100;           // 目标值为水平
+        roll_pid.desire = position_y_pid.output;
+        // roll_pid.desire = -lora3a22_uart_transfer.joystick[3] / 100;           // 目标值为水平
         // roll_pid.desire = compare_float((data_arr[2] / 10), -3.0f, 3.0f);
         roll_pid.measure = imu660rc_roll;                                      // 当前横滚角
         float gyro_x_meas = (imu660rc_gyro_x / imu660rc_transition_factor[1]); // 当前X轴角速度
