@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# IAR ELF Linker V9.40.1.364/W64 for ARM                  23/Jul/2026  09:48:20
+# IAR ELF Linker V9.40.1.364/W64 for ARM                  24/Jul/2026  15:30:29
 # Copyright 2007-2023 IAR Systems AB.
 #
 #    Output file  =
@@ -394,8 +394,8 @@ No sections matched the following patterns:
   .text              ro code  0x100a'0078       0x4  startup_cm7.o [31]
   .rodata            const    0x100a'007c       0x0  zero_init3.o [52]
   .rodata            const    0x100a'007c       0x0  lz77_init_single.o [52]
-  Initializer bytes  const    0x100a'007c     0x173  <for P2-1>
-                            - 0x100a'01ef  0x2'016f
+  Initializer bytes  const    0x100a'007c     0x174  <for P2-1>
+                            - 0x100a'01f0  0x2'0170
 
 Absolute sections:                             0x10
   .noinit            uninit   0x2800'1014      0x10  cm7_0_isr.o [45]
@@ -559,8 +559,8 @@ Zero (__iar_zero_init3)
           0x2802'0970  0x1206
 
 Copy/lz77 (__iar_lz77_init_single3)
-    1 source range, total size 0x173 (15% of destination):
-          0x100a'007c   0x173
+    1 source range, total size 0x174 (15% of destination):
+          0x100a'007c   0x174
     1 destination range, total size 0x970:
           0x2802'0000   0x970
 
@@ -773,12 +773,12 @@ C:\Code\beifen\old\CYT4BB7_Library-master\Seekfree_CYT4BB_Opensource_Library\pro
 
 C:\Code\beifen\old\CYT4BB7_Library-master\Seekfree_CYT4BB_Opensource_Library\project\iar\Debug_m7_0\Obj\user_8514941877209965082.dir: [45]
     adrc.o                           372
-    cm7_0_isr.o                    3'716       58      452       16
+    cm7_0_isr.o                    3'716       59      452       16
     main_cm7_0.o                     272       76        1
     pid.o                            296
     small_driver_uart_control.o      250                32
     ---------------------------------------------------------------
-    Total:                         4'906      134      485       16
+    Total:                         4'906      135      485       16
 
 C:\Code\beifen\old\CYT4BB7_Library-master\Seekfree_CYT4BB_Opensource_Library\project\iar\Debug_m7_0\Obj\zf_common_1201165462030747823.dir: [46]
     zf_common_clock.o                 28                 4
@@ -876,7 +876,7 @@ shb_l.a: [53]
     Gaps                              46        6
     Linker created                             32    8'192
 -------------------------------------------------------------------
-    Grand Total:                  41'478   90'089   15'350       16
+    Grand Total:                  41'478   90'090   15'350       16
 
 
 *******************************************************************************
@@ -1691,7 +1691,7 @@ zf_debug_init_flag      0x2802'1b68       0x1  Data  Lc  zf_common_debug.o [46]
 [54] = zf_device_config.a
 
   41'478 bytes of readonly  code memory
-  90'089 bytes of readonly  data memory
+  90'090 bytes of readonly  data memory
   15'350 bytes of readwrite data memory (+ 16 absolute)
 
 Errors: none

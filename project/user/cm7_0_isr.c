@@ -78,8 +78,8 @@ PID_Struct distance_pid = {.Kp = 1.2f, .Ki = 0.0f, .Kd = 0.0004f, .out_min = -12
 PID_Struct velocity_pid = {.Kp = 1.8f, .Ki = 0.02f, .Kd = 0.012f, .out_min = -2700.0f, .out_max = 2700.0f};
 
 // ¸ú³µ
-PID_Struct position_x_pid = {.Kp = 0.024f, .Ki = 0.0f, .Kd = 0.000005f, .out_min = -5.0f, .out_max = 5.0f};
-PID_Struct position_y_pid = {.Kp = 0.024f, .Ki = 0.0f, .Kd = 0.000005f, .out_min = -5.0f, .out_max = 5.0f};
+PID_Struct position_x_pid = {.Kp = 0.056f, .Ki = 0.0f, .Kd = 0.000005f, .out_min = -5.0f, .out_max = 5.0f};
+PID_Struct position_y_pid = {.Kp = 0.056f, .Ki = 0.0f, .Kd = 0.000005f, .out_min = -5.0f, .out_max = 5.0f};
 
 PID_Struct acc_y_pid = {.Kp = 0.8f, .Ki = 0.00f, .Kd = 0.00f, .out_min = -2000.0f, .out_max = 2000.0f};
 LADRC_1st_Struct gyro_y_adrc = {.b0 = 3.8f, .wo = 88.0f, .wc = 6.8f, .z1 = 0, .z2 = 0}; // ¸©Ñö½ÇËÙ¶È
