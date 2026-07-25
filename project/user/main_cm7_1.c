@@ -65,11 +65,11 @@ bool visited[height][width] = {false};
 uint8 image_copy[height][width];
 #pragma location = 0x28001014
 float data_arr[4] = {0}; // 0: beacon_lost 1: car_position_x 2: car_position_y 3: land_start
-// uint32 beacon_lost = 0;
-// #pragma location = 0x28001018
-// float car_position[2] = {0};
+                         // uint32 beacon_lost = 0;
+                         // #pragma location = 0x28001018
+                         // float car_position[2] = {0};
 
-    typedef struct
+typedef struct
 {
     int area;
     int sum_weight;
@@ -620,6 +620,10 @@ int main(void)
         static float last_car_dir_y = -1;
         static float last_car_cx = 0;
         static float last_car_cy = 0;
+        static uint16 beacon_lost_timer = 0;
+        static uint8 beacon_real_lost = 0;
+        static float last_beacon_cx = 0;
+        static float last_beacon_cy = 0;
         if (car.area > 0)
         {
             car_real_lost = 0;
@@ -645,16 +649,18 @@ int main(void)
                 car.dir_y = -1;
                 last_car_dir_x = car.dir_x;
                 last_car_dir_y = car.dir_y;
+                last_car_cx = car.cx;
+                last_car_cy = car.cy;
             }
             data_arr[1] = car.cx - MT9V03X_W / 2;
             data_arr[2] = car.cy - MT9V03X_H / 2;
-        }else
+        }
+        else
         {
             car_lost_timer++;
-            if (car_lost_timer > 100)   //小车识别丢失防抖
+            if (car_lost_timer > 5) // 小车识别丢失防抖(5帧)
             {
-                car_lost_timer = 0;
-
+                car_lost_timer = 5;
                 car_real_lost = 1;
             }
             data_arr[1] = 0;
@@ -663,9 +669,13 @@ int main(void)
 
         if (beacon1.area == 0 && beacon2.area == 0)
         {
+            beacon_lost_timer++;
             data_arr[0] = 0;
-        }else
+        }
+        else
         {
+            beacon_lost_timer = 0;
+            beacon_real_lost = 0;
             data_arr[0] = 1;
         }
         SCB_CleanInvalidateDCache_by_Addr(data_arr, sizeof(data_arr));
@@ -680,16 +690,28 @@ int main(void)
             float dist1 = (beacon1.cx - car.cx) * (beacon1.cx - car.cx) + (beacon1.cy - car.cy) * (beacon1.cy - car.cy);
             float dist2 = (beacon2.cx - car.cx) * (beacon2.cx - car.cx) + (beacon2.cy - car.cy) * (beacon2.cy - car.cy);
             target_beacon = (dist1 < dist2) ? beacon1 : beacon2;
+            last_beacon_cx = target_beacon.cx;
+            last_beacon_cy = target_beacon.cy;
         }
         else if (beacon1.area > 0)
         {
             target_beacon = beacon1;
+            last_beacon_cx = target_beacon.cx;
+            last_beacon_cy = target_beacon.cy;
             other_beacon = beacon2;
         }
         else if (beacon2.area > 0)
         {
             target_beacon = beacon2;
+            last_beacon_cx = target_beacon.cx;
+            last_beacon_cy = target_beacon.cy;
             other_beacon = beacon1;
+        }
+
+        if (beacon_lost_timer > 5)
+        {
+            beacon_lost_timer = 5;
+            beacon_real_lost = 1;
         }
 
         if (target_beacon.area > 0 && car.area > 0)
@@ -712,14 +734,27 @@ int main(void)
             err_fwd = vec_x * last_car_dir_x + vec_y * last_car_dir_y;
             err_lat = vec_x * right_x + vec_y * right_y;
         }
+        else if (target_beacon.area == 0 && car.area > 0 && beacon_real_lost == 0)
+        {
+            float vec_x = last_beacon_cx - car.cx;
+            float vec_y = last_beacon_cy - car.cy;
+
+            float right_x = car.dir_y;
+            float right_y = -car.dir_x;
+            err_fwd = vec_x * car.dir_x + vec_y * car.dir_y;
+            err_lat = vec_x * right_x + vec_y * right_y;
+        }
+        
         if (data_arr[3] < 10)
         {
             sprintf(car_dat, "%0.1f,%0.1f\n", err_fwd, err_lat);
             // printf("%s  ,  %0.2f,   %0.2f\n",car_dat,beacon1.cx,beacon1.cy);
             uart_write_string(UART_4, car_dat);
         }
-
-
+        else{
+            sprintf(car_dat, "%0.1f,%0.1f\n", 0, 0);
+            uart_write_string(UART_4, car_dat);
+        }
 
 #if WIFI_OPEN
         // 画图

@@ -164,7 +164,7 @@ void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
         static uint8 last_beacon_status = 1;
         static uint8 land_start = 0;
         float target_yaw = base_search_yaw;
-        if (land_timer > 8000)
+        if (land_timer > 8000) // 等待八秒
         {
             data_arr[3] = land_start;
             goto land;
@@ -174,7 +174,7 @@ void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
         {
             lost_timer = 0;
             if (beacon_real_loast > 200)
-            { // 防止将小车突然被识别成灯板(留大概5帧
+            { // 防止将小车突然被识别成信标(留大概5帧
                 land_timer = 0;
             }
 
@@ -592,11 +592,12 @@ void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
             }
             else /* if (dl1a_distance_mm < 150 && lora3a22_uart_transfer.switch_key[2] == 0)*/
             {
-                send_uart_motol(0, // 电机1
-                                0, // 电机2
-                                0, // 电机3
-                                0  // 电机4
-                );
+                // send_uart_motol(0, // 电机1
+                //                 0, // 电机2
+                //                 0, // 电机3
+                //                 0  // 电机4
+                // );
+                small_driver_set_duty(0, 0, 0, 0);
             }
         }
 
