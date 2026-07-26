@@ -752,7 +752,7 @@ int main(void)
             uart_write_string(UART_4, car_dat);
         }
         else{
-            sprintf(car_dat, "%0.1f,%0.1f\n", 0, 0);
+            sprintf(car_dat, "0.0,0.0\n");
             uart_write_string(UART_4, car_dat);
         }
 
