@@ -658,9 +658,9 @@ int main(void)
         else
         {
             car_lost_timer++;
-            if (car_lost_timer > 5) // 小车识别丢失防抖(5帧)
+            if (car_lost_timer > 20) // 小车识别丢失防抖(5帧)
             {
-                car_lost_timer = 5;
+                car_lost_timer = 21;
                 car_real_lost = 1;
             }
             data_arr[1] = 0;
@@ -708,9 +708,9 @@ int main(void)
             other_beacon = beacon1;
         }
 
-        if (beacon_lost_timer > 5)
+        if (beacon_lost_timer > 10)
         {
-            beacon_lost_timer = 5;
+            beacon_lost_timer = 11;
             beacon_real_lost = 1;
         }
 
