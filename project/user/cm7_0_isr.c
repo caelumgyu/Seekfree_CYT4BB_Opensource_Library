@@ -1,39 +1,39 @@
 /*********************************************************************************************************************
- * CYT4BB Opensourec Library ¼´£¨ CYT4BB ¿ªÔ´¿â£©ÊÇÒ»¸ö»ùÓÚ¹Ù·½ SDK ½Ó¿ÚµÄµÚÈı·½¿ªÔ´¿â
- * Copyright (c) 2022 SEEKFREE Öğ·É¿Æ¼¼
+ * CYT4BB Opensourec Library å³ï¼ˆ CYT4BB å¼€æºåº“ï¼‰æ˜¯ä¸€ä¸ªåŸºäºå®˜æ–¹ SDK æ¥å£çš„ç¬¬ä¸‰æ–¹å¼€æºåº“
+ * Copyright (c) 2022 SEEKFREE é€é£ç§‘æŠ€
  *
- * ±¾ÎÄ¼şÊÇ CYT4BB ¿ªÔ´¿âµÄÒ»²¿·Ö
+ * æœ¬æ–‡ä»¶æ˜¯ CYT4BB å¼€æºåº“çš„ä¸€éƒ¨åˆ†
  *
- * CYT4BB ¿ªÔ´¿â ÊÇÃâ·ÑÈí¼ş
- * Äú¿ÉÒÔ¸ù¾İ×ÔÓÉÈí¼ş»ù½ğ»á·¢²¼µÄ GPL£¨GNU General Public License£¬¼´ GNUÍ¨ÓÃ¹«¹²Ğí¿ÉÖ¤£©µÄÌõ¿î
- * ¼´ GPL µÄµÚ3°æ£¨¼´ GPL3.0£©»ò£¨ÄúÑ¡ÔñµÄ£©ÈÎºÎºóÀ´µÄ°æ±¾£¬ÖØĞÂ·¢²¼ºÍ/»òĞŞ¸ÄËü
+ * CYT4BB å¼€æºåº“ æ˜¯å…è´¹è½¯ä»¶
+ * æ‚¨å¯ä»¥æ ¹æ®è‡ªç”±è½¯ä»¶åŸºé‡‘ä¼šå‘å¸ƒçš„ GPLï¼ˆGNU General Public Licenseï¼Œå³ GNUé€šç”¨å…¬å…±è®¸å¯è¯ï¼‰çš„æ¡æ¬¾
+ * å³ GPL çš„ç¬¬3ç‰ˆï¼ˆå³ GPL3.0ï¼‰æˆ–ï¼ˆæ‚¨é€‰æ‹©çš„ï¼‰ä»»ä½•åæ¥çš„ç‰ˆæœ¬ï¼Œé‡æ–°å‘å¸ƒå’Œ/æˆ–ä¿®æ”¹å®ƒ
  *
- * ±¾¿ªÔ´¿âµÄ·¢²¼ÊÇÏ£ÍûËüÄÜ·¢»Ó×÷ÓÃ£¬µ«²¢Î´¶ÔÆä×÷ÈÎºÎµÄ±£Ö¤
- * ÉõÖÁÃ»ÓĞÒşº¬µÄÊÊÏúĞÔ»òÊÊºÏÌØ¶¨ÓÃÍ¾µÄ±£Ö¤
- * ¸ü¶àÏ¸½ÚÇë²Î¼û GPL
+ * æœ¬å¼€æºåº“çš„å‘å¸ƒæ˜¯å¸Œæœ›å®ƒèƒ½å‘æŒ¥ä½œç”¨ï¼Œä½†å¹¶æœªå¯¹å…¶ä½œä»»ä½•çš„ä¿è¯
+ * ç”šè‡³æ²¡æœ‰éšå«çš„é€‚é”€æ€§æˆ–é€‚åˆç‰¹å®šç”¨é€”çš„ä¿è¯
+ * æ›´å¤šç»†èŠ‚è¯·å‚è§ GPL
  *
- * ÄúÓ¦¸ÃÔÚÊÕµ½±¾¿ªÔ´¿âµÄÍ¬Ê±ÊÕµ½Ò»·İ GPL µÄ¸±±¾
- * Èç¹ûÃ»ÓĞ£¬Çë²ÎÔÄ<https://www.gnu.org/licenses/>
+ * æ‚¨åº”è¯¥åœ¨æ”¶åˆ°æœ¬å¼€æºåº“çš„åŒæ—¶æ”¶åˆ°ä¸€ä»½ GPL çš„å‰¯æœ¬
+ * å¦‚æœæ²¡æœ‰ï¼Œè¯·å‚é˜…<https://www.gnu.org/licenses/>
  *
- * ¶îÍâ×¢Ã÷£º
- * ±¾¿ªÔ´¿âÊ¹ÓÃ GPL3.0 ¿ªÔ´Ğí¿ÉÖ¤Ğ­Òé ÒÔÉÏĞí¿ÉÉêÃ÷ÎªÒëÎÄ°æ±¾
- * Ğí¿ÉÉêÃ÷Ó¢ÎÄ°æÔÚ libraries/doc ÎÄ¼ş¼ĞÏÂµÄ GPL3_permission_statement.txt ÎÄ¼şÖĞ
- * Ğí¿ÉÖ¤¸±±¾ÔÚ libraries ÎÄ¼ş¼ĞÏÂ ¼´¸ÃÎÄ¼ş¼ĞÏÂµÄ LICENSE ÎÄ¼ş
- * »¶Ó­¸÷Î»Ê¹ÓÃ²¢´«²¥±¾³ÌĞò µ«ĞŞ¸ÄÄÚÈİÊ±±ØĞë±£ÁôÖğ·É¿Æ¼¼µÄ°æÈ¨ÉùÃ÷£¨¼´±¾ÉùÃ÷£©
+ * é¢å¤–æ³¨æ˜ï¼š
+ * æœ¬å¼€æºåº“ä½¿ç”¨ GPL3.0 å¼€æºè®¸å¯è¯åè®® ä»¥ä¸Šè®¸å¯ç”³æ˜ä¸ºè¯‘æ–‡ç‰ˆæœ¬
+ * è®¸å¯ç”³æ˜è‹±æ–‡ç‰ˆåœ¨ libraries/doc æ–‡ä»¶å¤¹ä¸‹çš„ GPL3_permission_statement.txt æ–‡ä»¶ä¸­
+ * è®¸å¯è¯å‰¯æœ¬åœ¨ libraries æ–‡ä»¶å¤¹ä¸‹ å³è¯¥æ–‡ä»¶å¤¹ä¸‹çš„ LICENSE æ–‡ä»¶
+ * æ¬¢è¿å„ä½ä½¿ç”¨å¹¶ä¼ æ’­æœ¬ç¨‹åº ä½†ä¿®æ”¹å†…å®¹æ—¶å¿…é¡»ä¿ç•™é€é£ç§‘æŠ€çš„ç‰ˆæƒå£°æ˜ï¼ˆå³æœ¬å£°æ˜ï¼‰
  *
- * ÎÄ¼şÃû³Æ          cm7_0_isr
- * ¹«Ë¾Ãû³Æ          ³É¶¼Öğ·É¿Æ¼¼ÓĞÏŞ¹«Ë¾
- * °æ±¾ĞÅÏ¢          ²é¿´ libraries/doc ÎÄ¼ş¼ĞÄÚ version ÎÄ¼ş °æ±¾ËµÃ÷
- * ¿ª·¢»·¾³          IAR 9.40.1
- * ÊÊÓÃÆ½Ì¨          CYT4BB
- * µêÆÌÁ´½Ó          https://seekfree.taobao.com/
+ * æ–‡ä»¶åç§°          cm7_0_isr
+ * å…¬å¸åç§°          æˆéƒ½é€é£ç§‘æŠ€æœ‰é™å…¬å¸
+ * ç‰ˆæœ¬ä¿¡æ¯          æŸ¥çœ‹ libraries/doc æ–‡ä»¶å¤¹å†… version æ–‡ä»¶ ç‰ˆæœ¬è¯´æ˜
+ * å¼€å‘ç¯å¢ƒ          IAR 9.40.1
+ * é€‚ç”¨å¹³å°          CYT4BB
+ * åº—é“ºé“¾æ¥          https://seekfree.taobao.com/
  *
- * ĞŞ¸Ä¼ÇÂ¼
- * ÈÕÆÚ              ×÷Õß                ±¸×¢
+ * ä¿®æ”¹è®°å½•
+ * æ—¥æœŸ              ä½œè€…                å¤‡æ³¨
  * 2024-1-9      pudding            first version
- * 2024-5-14     pudding            ĞÂÔö12¸öpitÖÜÆÚÖĞ¶Ï Ôö¼Ó²¿·Ö×¢ÊÍËµÃ÷
- * 2025-2-4      pudding            ÓÅ»¯´®¿ÚÖĞ¶ÏÂß¼­£¬·ÀÖ¹ÒâÍâ¸ÉÈÅµ¼ÖÂµÄ¿¨ËÀÎÊÌâ£¬ÓÅ»¯´®¿Ú²¨ÌØÂÊ¼ÆËãÂß¼­
- * 2025-2-4      pudding            ĞÂÔöÁ½¸ö´®¿Ú½Ó¿Ú
+ * 2024-5-14     pudding            æ–°å¢12ä¸ªpitå‘¨æœŸä¸­æ–­ å¢åŠ éƒ¨åˆ†æ³¨é‡Šè¯´æ˜
+ * 2025-2-4      pudding            ä¼˜åŒ–ä¸²å£ä¸­æ–­é€»è¾‘ï¼Œé˜²æ­¢æ„å¤–å¹²æ‰°å¯¼è‡´çš„å¡æ­»é—®é¢˜ï¼Œä¼˜åŒ–ä¸²å£æ³¢ç‰¹ç‡è®¡ç®—é€»è¾‘
+ * 2025-2-4      pudding            æ–°å¢ä¸¤ä¸ªä¸²å£æ¥å£
  ********************************************************************************************************************/
 
 #include "zf_common_headfile.h"
@@ -43,10 +43,10 @@
 #include "small_driver_uart_control.h"
 
 bool flow_complete = false;
-bool dir1 = false; // Ò»°ãÇé¿öÏÂtrue»áÈÃµç»úË³Ê±ÕëĞı×ª
-bool dir2 = false; // µ«ÊÇ¾ßÌåÇé¿ö»¹Òª¿´µç»úµÄ½ÓÏß·½Ê½£¬¿ÉÄÜĞèÒªµ÷Õû
-bool dir3 = false;  // ÕâÀïµÄµç»ú1ÒòÎª½ÓÏß²»Í¬µ¼ÖÂ·´×ª£¬ËùÒÔÉèÖÃÎªfalse£¬ÆäËûÈı¸öµç»ú½ÓÏß·½Ê½ÏàÍ¬£¬ËùÒÔÉèÖÃÎªtrue
-bool dir4 = true; // Èç¹ûÍÓÂİÒÇÊı¾İÓëÔ¤ÆÚµÄĞı×ª·½ÏòÏà·´£¬¿ÉÒÔÍ¨¹ıµ÷ÕûÕâĞ©·½Ïò±äÁ¿À´ĞŞÕı
+bool dir1 = false; // ä¸€èˆ¬æƒ…å†µä¸‹trueä¼šè®©ç”µæœºé¡ºæ—¶é’ˆæ—‹è½¬
+bool dir2 = true;  // ä½†æ˜¯å…·ä½“æƒ…å†µè¿˜è¦çœ‹ç”µæœºçš„æ¥çº¿æ–¹å¼ï¼Œå¯èƒ½éœ€è¦è°ƒæ•´
+bool dir3 = false; // è¿™é‡Œçš„ç”µæœº1å› ä¸ºæ¥çº¿ä¸åŒå¯¼è‡´åè½¬ï¼Œæ‰€ä»¥è®¾ç½®ä¸ºfalseï¼Œå…¶ä»–ä¸‰ä¸ªç”µæœºæ¥çº¿æ–¹å¼ç›¸åŒï¼Œæ‰€ä»¥è®¾ç½®ä¸ºtrue
+bool dir4 = false; // å¦‚æœé™€èºä»ªæ•°æ®ä¸é¢„æœŸçš„æ—‹è½¬æ–¹å‘ç›¸åï¼Œå¯ä»¥é€šè¿‡è°ƒæ•´è¿™äº›æ–¹å‘å˜é‡æ¥ä¿®æ­£
 int16_t output_duty1 = 0;
 int16_t output_duty2 = 0;
 int16_t output_duty3 = 0;
@@ -58,55 +58,60 @@ float out_roll;
 float out_yaw;
 int16 dist;
 
-float last_filtered_distance_mm = 0; // ¼ÇÂ¼ÉÏÒ»´Î¸ß¶ÈÇóÎ¢·Ö
-float current_vel_mm_s = 0;          // µ±Ç°´¹Ö±ËÙ¶È
-float base_hover_throttle = 6800.0f; // »ù´¡ĞüÍ£ÓÍÃÅ
+float last_filtered_distance_mm = 0; // è®°å½•ä¸Šä¸€æ¬¡é«˜åº¦æ±‚å¾®åˆ†
+float current_vel_mm_s = 0;          // å½“å‰å‚ç›´é€Ÿåº¦
+float base_hover_throttle = 6800.0f; // åŸºç¡€æ‚¬åœæ²¹é—¨
 #pragma location = 0x28001014
-__no_init float data_arr[3];
+__no_init float data_arr[4];
 // __no_init uint32 beacon_lost;
 // #pragma location = 0x28001018
 // __no_init float car_position[2];
 // uint32 last_beacon_lost = 0;
 
-// PID½á¹¹Ìå(ÏÈµ÷ÄÚ»·£¬ºóµ÷Íâ»·)
+// PIDç»“æ„ä½“(å…ˆè°ƒå†…ç¯ï¼Œåè°ƒå¤–ç¯)
 PID_Struct pitch_pid = {.Kp = 2.4f, .Ki = 0.00f, .Kd = 0.00f, .out_min = -2000.0f, .out_max = 2000.0f};
 PID_Struct roll_pid = {.Kp = 2.4f, .Ki = 0.00f, .Kd = 0.00f, .out_min = -2000.0f, .out_max = 2000.0f};
 PID_Struct yaw_pid = {.Kp = 0.8f, .Ki = 0.00f, .Kd = 0.00f, .out_min = -800.0f, .out_max = 800.0f};
 
-// ¶¨¸ß
-PID_Struct distance_pid = {.Kp = 1.2f, .Ki = 0.0f, .Kd = 0.0004f, .out_min = -1200.0f, .out_max = 1200.0f, .desire = 120.0f};
-PID_Struct velocity_pid = {.Kp = 1.8f, .Ki = 0.02f, .Kd = 0.012f, .out_min = -2700.0f, .out_max = 2700.0f};
+// å®šé«˜
+PID_Struct distance_pid = {.Kp = 1.2f, .Ki = 0.0f, .Kd = 0.0004f, .out_min = -1200.0f, .out_max = 1200.0f, .desire = 200.0f};
+PID_Struct velocity_pid = {.Kp = 2.8f, .Ki = 0.0f, .Kd = 0.024f, .out_min = -2700.0f, .out_max = 2700.0f};
 
-// // ¶¨µã
-// PID_Struct position_x_pid = {.Kp = 0.0f, .Ki = 0.0f, .Kd = 0.0f, .out_min = -800.0f, .out_max = 800.0f};
-// PID_Struct position_y_pid = {.Kp = 0.0f, .Ki = 0.0f, .Kd = 0.0f, .out_min = -800.0f, .out_max = 800.0f};
+// è·Ÿè½¦
+PID_Struct position_x_pid = {.Kp = 0.068f, .Ki = 0.0f, .Kd = 0.000012f, .out_min = -8.0f, .out_max = 8.0f};
+PID_Struct position_y_pid = {.Kp = 0.068f, .Ki = 0.0f, .Kd = 0.000012f, .out_min = -8.0f, .out_max = 8.0f};
 
 PID_Struct acc_y_pid = {.Kp = 0.8f, .Ki = 0.00f, .Kd = 0.00f, .out_min = -2000.0f, .out_max = 2000.0f};
-LADRC_1st_Struct gyro_y_adrc = {.b0 = 3.6f, .wo = 88.0f, .wc = 6.8f, .z1 = 0, .z2 = 0}; // ¸©Ñö½ÇËÙ¶È
-LADRC_1st_Struct gyro_x_adrc = {.b0 = 3.6f, .wo = 98.0f, .wc = 7.2f, .z1 = 0, .z2 = 0}; // ºá¹ö½ÇËÙ¶È
-LADRC_1st_Struct gyro_z_adrc = {.b0 = 3.6f, .wo = 58.0f, .wc = 4.8f, .z1 = 0, .z2 = 0}; // Æ«º½½ÇËÙ¶È
+LADRC_1st_Struct gyro_y_adrc = {.b0 = 3.8f, .wo = 88.0f, .wc = 6.8f, .z1 = 0, .z2 = 0}; // ä¿¯ä»°è§’é€Ÿåº¦
+LADRC_1st_Struct gyro_x_adrc = {.b0 = 3.8f, .wo = 98.0f, .wc = 7.2f, .z1 = 0, .z2 = 0}; // æ¨ªæ»šè§’é€Ÿåº¦
+LADRC_1st_Struct gyro_z_adrc = {.b0 = 3.2f, .wo = 58.0f, .wc = 4.8f, .z1 = 0, .z2 = 0}; // åèˆªè§’é€Ÿåº¦
 
 // LADRC_1st_Struct *LADRC_p[3] = {&gyro_x_adrc, &gyro_y_adrc, &gyro_z_adrc};
 
 void send_uart_motol(float duty1, float duty2, float duty3, float duty4);
 
-// **************************** PITÖĞ¶Ïº¯Êı ****************************
-void pit0_ch0_isr() // ¶¨Ê±Æ÷Í¨µÀ 0 ÖÜÆÚÖĞ¶Ï·şÎñº¯Êı
+// **************************** PITä¸­æ–­å‡½æ•° ****************************
+void pit0_ch0_isr() // å®šæ—¶å™¨é€šé“ 0 å‘¨æœŸä¸­æ–­æœåŠ¡å‡½æ•°
 {
     pit_isr_flag_clear(PIT_CH0);
 
-    // Ò£¿ØÆ÷²¦Âë¿ª¹Ø
+    // é¥æ§å™¨æ‹¨ç å¼€å…³
     if (lora3a22_uart_transfer.switch_key[1] == 1)
     {
         imu660rc_get_gyro();
-        imu660rc_get_acc(); 
+        imu660rc_get_acc();
+
+        static uint8 no_start = 0;
+        static int16 no_start_angle = 0;
+        static int16 no_start_count = 0;
+        static float filtered_gyro_distance_mm = 0;
 
         // vl53l8cx_get_data();
-        // vl53l8cx_get_center_distance(&dist); // »ñÈ¡ÖĞĞÄÇøÓòÆ½¾ù¾àÀë
+        // vl53l8cx_get_center_distance(&dist); // è·å–ä¸­å¿ƒåŒºåŸŸå¹³å‡è·ç¦»
         // if (dist == 65535)
         //     dist = 149;
 
-        // TOFµÍÍ¨ÂË²¨
+        // TOFä½é€šæ»¤æ³¢
         static float filtered_distance_mm = 0;
         // filtered_distance_mm = 0.4f * dl1a_distance_mm + 0.6f * filtered_distance_mm;
         filtered_distance_mm = 0.6f * vl53l8cx_distance_mm + 0.4f * filtered_distance_mm;
@@ -126,123 +131,182 @@ void pit0_ch0_isr() // ¶¨Ê±Æ÷Í¨µÀ 0 ÖÜÆÚÖĞ¶Ï·şÎñº¯Êı
         // SCB_CleanInvalidateDCache_by_Addr(car_position, sizeof(car_position));
         SCB_CleanInvalidateDCache_by_Addr(data_arr, sizeof(data_arr));
 
+        position_x_pid.desire = data_arr[1];
+        position_x_pid.measure = 0;
+        position_y_pid.desire = data_arr[2];
+        position_y_pid.measure = 0;
+        PID_Calc(&position_x_pid);
+        PID_Calc(&position_y_pid);
+
         // printf("Data:%d,   %d,   %d\n", imu660rc_gyro_x-x_zero, imu660rc_gyro_y-y_zero, imu660rc_gyro_z-z_zero);
-        //  ¸©Ñö½Ç
-        // pitch_pid.desire = -lora3a22_uart_transfer.joystick[2] / 100;          // Ä¿±êÖµÎªË®Æ½
-        pitch_pid.desire = compare_float(data_arr[1] / 10, -5.0f, 5.0f);
-        pitch_pid.measure = imu660rc_pitch;                                    // µ±Ç°¸©Ñö½Ç
-        float gyro_y_meas = (imu660rc_gyro_y / imu660rc_transition_factor[1]); // µ±Ç°YÖá½ÇËÙ¶È
+        //  ä¿¯ä»°è§’
+        pitch_pid.desire = position_x_pid.output;
+        // pitch_pid.desire = -lora3a22_uart_transfer.joystick[2] / 100;          // ç›®æ ‡å€¼ä¸ºæ°´å¹³
+        // pitch_pid.desire = compare_float(data_arr[1] / 10, -3.0f, 3.0f);
+        pitch_pid.measure = imu660rc_pitch;                                    // å½“å‰ä¿¯ä»°è§’
+        float gyro_y_meas = (imu660rc_gyro_y / imu660rc_transition_factor[1]); // å½“å‰Yè½´è§’é€Ÿåº¦
 
-        // ºá¹ö½Ç
-        // roll_pid.desire = -lora3a22_uart_transfer.joystick[3] / 100;           // Ä¿±êÖµÎªË®Æ½
-        roll_pid.desire = compare_float((data_arr[2] / 10), -5.0f, 5.0f);
-        roll_pid.measure = imu660rc_roll;                                      // µ±Ç°ºá¹ö½Ç
-        float gyro_x_meas = (imu660rc_gyro_x / imu660rc_transition_factor[1]); // µ±Ç°XÖá½ÇËÙ¶È
+        // æ¨ªæ»šè§’
+        roll_pid.desire = position_y_pid.output;
+        // roll_pid.desire = -lora3a22_uart_transfer.joystick[3] / 100;           // ç›®æ ‡å€¼ä¸ºæ°´å¹³
+        // roll_pid.desire = compare_float((data_arr[2] / 10), -3.0f, 3.0f);
+        roll_pid.measure = imu660rc_roll;                                      // å½“å‰æ¨ªæ»šè§’
+        float gyro_x_meas = (imu660rc_gyro_x / imu660rc_transition_factor[1]); // å½“å‰Xè½´è§’é€Ÿåº¦
 
-        // // Æ«º½½Ç
-        // yaw_pid.desire = imu660rc_yaw;                                         // ·½Ïò²»±ä
-        // yaw_pid.measure = -lora3a22_uart_transfer.joystick[0] / 100;           // µ±Ç°Æ«º½½Ç
-        // float gyro_z_meas = (imu660rc_gyro_z / imu660rc_transition_factor[1]); // µ±Ç°ZÖá½ÇËÙ¶È
+        // // åèˆªè§’
+        // yaw_pid.desire = imu660rc_yaw;                                         // æ–¹å‘ä¸å˜
+        // yaw_pid.measure = -lora3a22_uart_transfer.joystick[0] / 100;           // å½“å‰åèˆªè§’
+        // float gyro_z_meas = (imu660rc_gyro_z / imu660rc_transition_factor[1]); // å½“å‰Zè½´è§’é€Ÿåº¦
 
+        if (no_start == 0 && filtered_gyro_distance_mm >= 1000) // é«˜åº¦å¾—å¤§äº1000
+        {
+            yaw_pid.desire = imu660rc_yaw;
+            yaw_pid.measure = no_start_angle;
+            if (no_start_count < 20)
+            {
+                no_start_count++;
+            }
+            else
+            {
+                no_start_count = 0;
+                no_start_angle += 1;
+            }
+            if (no_start_angle > 370)
+            {
+                no_start = 1;
+            }
+            goto nostart;
+        }
 
         static float base_search_yaw = 0.0f;
         static uint16 search_timer = 0;
         static uint16 beacon_timer = 0;
+        static uint16 beacon_real_loast = 0;
         static uint16 lost_timer = 0;
+        static uint16 land_timer = 0;
         static uint8 search_start = 0;
         static uint8 search_state = 0;
         static uint8 last_beacon_status = 1;
+        static uint8 land_start = 0;
         float target_yaw = base_search_yaw;
-
-        if (data_arr[0] == 1) // Ê¶±ğµ½ÁËĞÅ±ê
+        if (no_start == 1)
         {
-            lost_timer = 0;
 
-            if (last_beacon_status == 0) // ÉÏÒ»´ÎÊÇ¶ªÊ§×´Ì¬
+            if (land_timer > 8000) // ç­‰å¾…å…«ç§’
             {
-                beacon_timer = 0;
-                last_beacon_status = 1;
-            }else {
-                beacon_timer++;
-                if (beacon_timer > 100)
+                data_arr[3] = land_start;
+                goto land;
+            }
+
+            if (data_arr[0] == 1) // è¯†åˆ«åˆ°äº†ä¿¡æ ‡
+            {
+                lost_timer = 0;
+                if (beacon_real_loast > 200)
+                { // é˜²æ­¢å°†å°è½¦çªç„¶è¢«è¯†åˆ«æˆä¿¡æ ‡(ç•™å¤§æ¦‚5å¸§
+                    land_timer = 0;
+                }
+
+                if (last_beacon_status == 0) // ä¸Šä¸€æ¬¡æ˜¯ä¸¢å¤±çŠ¶æ€
                 {
+                    beacon_real_loast = 0;
                     beacon_timer = 0;
-                    base_search_yaw = imu660rc_yaw; // ¼ÇÂ¼µ±Ç°Æ«º½½Ç×÷Îª»ù×¼
+                    last_beacon_status = 1;
                 }
-            }
-
-            target_yaw = imu660rc_yaw;
-            // ÖØÖÃËÑË÷×´Ì¬£¬ÎªÏÂÒ»´Î¶ªÊ§×ö×¼±¸
-            last_beacon_status = 1;
-            search_timer = 0;
-            search_state = 0;
-            search_start = 0;
-        }
-        else if (data_arr[0] == 0) // Î´Ê¶±ğµ½ĞÅ±ê
-        {
-
-            beacon_timer = 0;
-            if (last_beacon_status == 1)
-            {
-                // base_search_yaw = imu660rc_yaw;
-                // target_yaw = base_search_yaw;
-
-                last_beacon_status = 0;
-                search_timer = 0;
-                search_start = 0;
-                search_state = 0;
-            }
-            else
-            {
-                lost_timer++;
-                if(lost_timer > 100 && search_start == 0){
-                    lost_timer = 0;
-                    search_start = 1;
-                    search_state = !search_state;
-                }
-                if(search_start == 1){
-                    search_timer++;
-
-                    if (search_timer > 1200)
+                else
+                {
+                    beacon_real_loast++;
+                    beacon_timer++;
+                    if (beacon_timer > 100)
                     {
-                        search_timer = 0;
+                        beacon_timer = 0;
+                        base_search_yaw = imu660rc_yaw; // è®°å½•å½“å‰åèˆªè§’ä½œä¸ºåŸºå‡†
+                    }
+                }
+
+                target_yaw = imu660rc_yaw;
+                // é‡ç½®æœç´¢çŠ¶æ€ï¼Œä¸ºä¸‹ä¸€æ¬¡ä¸¢å¤±åšå‡†å¤‡
+                last_beacon_status = 1;
+                search_timer = 0;
+                search_state = 0;
+                search_start = 0;
+            }
+            else if (data_arr[0] == 0) // æœªè¯†åˆ«åˆ°ä¿¡æ ‡
+            {
+                beacon_real_loast = 0;
+                beacon_timer = 0;
+                if (last_beacon_status == 1)
+                {
+                    // base_search_yaw = imu660rc_yaw;
+                    // target_yaw = base_search_yaw;
+                    // ç²—ç•¥è®¡ç®—ç­ç¯æ¬¡æ•°
+                    land_start += 1;
+                    if (land_start > 10)
+                    {
+                        land_start = 10;
+                    }
+                    last_beacon_status = 0;
+                    search_timer = 0;
+                    search_start = 0;
+                    search_state = 0;
+                }
+                else
+                {
+                    if (land_start == 10)
+                    {
+                        land_timer++;
+                    }
+
+                    lost_timer++;
+                    if (lost_timer > 100 && search_start == 0)
+                    {
+                        lost_timer = 0;
+                        search_start = 1;
                         search_state = !search_state;
                     }
-
-                    if (search_state == 0)
+                    if (search_start == 1)
                     {
-                        target_yaw = base_search_yaw;
-                    }
-                    else
-                    {
-                        target_yaw = base_search_yaw + 120.0f;
-                    }
+                        search_timer++;
 
-                    if (target_yaw > 180.0f)
-                        target_yaw -= 360.0f;
-                    else if (target_yaw < -180.0f)
-                        target_yaw += 360.0f;
+                        if (search_timer > 1500)
+                        {
+                            search_timer = 0;
+                            search_state = !search_state;
+                        }
+
+                        if (search_state == 0)
+                        {
+                            target_yaw = base_search_yaw;
+                        }
+                        else
+                        {
+                            target_yaw = base_search_yaw + 130.0f;
+                        }
+
+                        if (target_yaw > 180.0f)
+                            target_yaw -= 360.0f;
+                        else if (target_yaw < -180.0f)
+                            target_yaw += 360.0f;
+                    }
                 }
-
             }
         }
-
-        // Æ«º½½Ç
-        yaw_pid.desire = imu660rc_yaw; // µ±Ç°IMUÆ«º½½Ç (-180µ½180)
+        // åèˆªè§’
+        yaw_pid.desire = imu660rc_yaw; // å½“å‰IMUåèˆªè§’ (-180åˆ°180)
         // static uint8 yaw_count = 0;
-        // if (yaw_count < 40) // Ã¿40msÀÛ¼ÓÒ»´Î
+        // if (yaw_count < 40) // æ¯40msç´¯åŠ ä¸€æ¬¡
         // {
         //     yaw_count++;
         // }
         // else
         // {
         //     yaw_count = 0;
-        //     yaw_pid.measure -= lora3a22_uart_transfer.joystick[0] / 500.0f; // ÀÛ¼ÓÒ¡¸ËÁ¿×÷ÎªÄ¿±ê
+        //     yaw_pid.measure -= lora3a22_uart_transfer.joystick[0] / 500.0f; // ç´¯åŠ æ‘‡æ†é‡ä½œä¸ºç›®æ ‡
         // }
         yaw_pid.measure = target_yaw;
-        // yaw_pid.measure = 0;
+    // yaw_pid.measure = 0;
+    nostart:
 
-        // Ëã³öÁ½ÕßµÄÔ­Ê¼²îÖµ
+        // ç®—å‡ºä¸¤è€…çš„åŸå§‹å·®å€¼
         float yaw_diff = yaw_pid.desire - yaw_pid.measure;
 
         if (yaw_diff > 180.0f)
@@ -254,18 +318,18 @@ void pit0_ch0_isr() // ¶¨Ê±Æ÷Í¨µÀ 0 ÖÜÆÚÖĞ¶Ï·şÎñº¯Êı
             yaw_pid.measure -= 360.0f;
         }
 
-        float gyro_z_meas = (imu660rc_gyro_z / imu660rc_transition_factor[1]); // µ±Ç°ZÖá½ÇËÙ¶È
+        float gyro_z_meas = (imu660rc_gyro_z / imu660rc_transition_factor[1]); // å½“å‰Zè½´è§’é€Ÿåº¦
 
-        // ¾àÀë
-        static float filtered_gyro_distance_mm = 0;
-        filtered_gyro_distance_mm = cosf(PI / 180 * imu660rc_roll) * filtered_distance_mm * cosf(PI / 180 * imu660rc_pitch); // ¸ù¾İ×ËÌ¬µ÷Õû¾àÀë²âÁ¿Öµ
+        // è·ç¦»
 
-        // ´¹Ö±·½ÏòËÙ¶ÈºÍÂË²¨
-        float raw_vel_mm_s = (filtered_gyro_distance_mm - last_filtered_distance_mm) / (TIME_DELAY * 50); // tofÆµÂÊÊÇ50hz
-        current_vel_mm_s = 0.8f * raw_vel_mm_s + 0.2f * current_vel_mm_s;                             // È¨ÖØ0.2¿¹ÔëÉù
+        filtered_gyro_distance_mm = cosf(PI / 180 * imu660rc_roll) * filtered_distance_mm * cosf(PI / 180 * imu660rc_pitch); // æ ¹æ®å§¿æ€è°ƒæ•´è·ç¦»æµ‹é‡å€¼
+
+        // å‚ç›´æ–¹å‘é€Ÿåº¦å’Œæ»¤æ³¢
+        float raw_vel_mm_s = (filtered_gyro_distance_mm - last_filtered_distance_mm) / (TIME_DELAY * 50); // tofé¢‘ç‡æ˜¯50hz
+        current_vel_mm_s = 0.8f * raw_vel_mm_s + 0.2f * current_vel_mm_s;
         last_filtered_distance_mm = filtered_gyro_distance_mm;
 
-        // Ò»ºÁÃëÀÛ¼ÓÒ»´Î
+        // ä¸€æ¯«ç§’ç´¯åŠ ä¸€æ¬¡
         static uint8 distance_count = 0;
         if (distance_count < 15)
         {
@@ -277,16 +341,16 @@ void pit0_ch0_isr() // ¶¨Ê±Æ÷Í¨µÀ 0 ÖÜÆÚÖĞ¶Ï·şÎñº¯Êı
             distance_pid.desire += lora3a22_uart_transfer.joystick[1] / 500;
         }
 
-        distance_pid.desire = compare_float(distance_pid.desire, -500.0f, 1700.0f);
+        distance_pid.desire = compare_float(distance_pid.desire, -600.0f, 2000.0f);
 
         // global_output += lora3a22_uart_transfer.joystick[1]/1000;
 
-        // Íâ»·Ê¹ÓÃP¿ØÖÆ
+        // å¤–ç¯ä½¿ç”¨Pæ§åˆ¶
         PID_Calc(&pitch_pid);
         PID_Calc(&roll_pid);
         PID_Calc(&yaw_pid);
 
-        float err_distance = distance_pid.desire - filtered_gyro_distance_mm; // ¼ÆËãÔ­Ê¼Îó²î
+        float err_distance = distance_pid.desire - filtered_gyro_distance_mm; // è®¡ç®—åŸå§‹è¯¯å·®
 
         if (err_distance > 20.0f)
         {
@@ -298,50 +362,50 @@ void pit0_ch0_isr() // ¶¨Ê±Æ÷Í¨µÀ 0 ÖÜÆÚÖĞ¶Ï·şÎñº¯Êı
         }
         else
         {
-            
+
             distance_pid.measure = distance_pid.desire;
         }
-        // distance_pid.measure = filtered_gyro_distance_mm; // Íâ»·²âÁ¿Öµ
-        velocity_pid.measure = current_vel_mm_s;     // ÄÚ»·²âÁ¿Öµ
+        // distance_pid.measure = filtered_gyro_distance_mm; // å¤–ç¯æµ‹é‡å€¼
+        velocity_pid.measure = current_vel_mm_s; // å†…ç¯æµ‹é‡å€¼
         PID_Calc_chain(&distance_pid, &velocity_pid);
 
-        // ×îÖÕÈ«¾ÖÓÍÃÅ = ĞüÍ£»ù×¼Öµ + ´®¼¶ÄÚ»·µÄÊä³ö²¹³¥Á¿
+        // æœ€ç»ˆå…¨å±€æ²¹é—¨ = æ‚¬åœåŸºå‡†å€¼ + ä¸²çº§å†…ç¯çš„è¾“å‡ºè¡¥å¿é‡
         global_output = base_hover_throttle + velocity_pid.output;
         global_output = compare_float(global_output, MIN_DUTY * 100.0f, 95 * 100.0f);
 
-        // È«¾ÖÓÍÃÅµÍÍ¨ÂË²¨
+        // å…¨å±€æ²¹é—¨ä½é€šæ»¤æ³¢
         // global_output = 0.6f * global_output + 0.4f * last_global_output;
         // last_global_output = global_output;
         // global_output =1000;
 
-        // ×÷ÓÃ¸øµç»ú
-        // ÈıÕßÎªµş¼Ó¹ØÏµ (¸ù¾İÍÓÂİÒÇºÍËÄĞıÒíµÄ·½Î»¹ØÏµÀ´µ÷Õû)
-        //   µç»ú1 =  ¸©Ñö½ÇPIDÊä³ö + ºá¹ö½ÇPIDÊä³ö + Æ«º½½ÇPIDÊä³ö
-        //   µç»ú2 =  ¸©Ñö½ÇPIDÊä³ö - ºá¹ö½ÇPIDÊä³ö - Æ«º½½ÇPIDÊä³ö
-        //   µç»ú3 = -¸©Ñö½ÇPIDÊä³ö + ºá¹ö½ÇPIDÊä³ö - Æ«º½½ÇPIDÊä³ö
-        //   µç»ú4 = -¸©Ñö½ÇPIDÊä³ö - ºá¹ö½ÇPIDÊä³ö + Æ«º½½ÇPIDÊä³ö
-        //   ÄæÊ±Õë1111********2222Ë³Ê±Õë
+        // ä½œç”¨ç»™ç”µæœº
+        // ä¸‰è€…ä¸ºå åŠ å…³ç³» (æ ¹æ®é™€èºä»ªå’Œå››æ—‹ç¿¼çš„æ–¹ä½å…³ç³»æ¥è°ƒæ•´)
+        //   ç”µæœº1 =  ä¿¯ä»°è§’PIDè¾“å‡º + æ¨ªæ»šè§’PIDè¾“å‡º + åèˆªè§’PIDè¾“å‡º
+        //   ç”µæœº2 =  ä¿¯ä»°è§’PIDè¾“å‡º - æ¨ªæ»šè§’PIDè¾“å‡º - åèˆªè§’PIDè¾“å‡º
+        //   ç”µæœº3 = -ä¿¯ä»°è§’PIDè¾“å‡º + æ¨ªæ»šè§’PIDè¾“å‡º - åèˆªè§’PIDè¾“å‡º
+        //   ç”µæœº4 = -ä¿¯ä»°è§’PIDè¾“å‡º - æ¨ªæ»šè§’PIDè¾“å‡º + åèˆªè§’PIDè¾“å‡º
+        //   é€†æ—¶é’ˆ1111********2222é¡ºæ—¶é’ˆ
         //         1111********2222
         //         ****************
         //         ****************
-        //   Ë³Ê±Õë3333********4444ÄæÊ±Õë
+        //   é¡ºæ—¶é’ˆ3333********4444é€†æ—¶é’ˆ
         //         3333********4444
 
-        // send_uart_motol(global_output + out_pitch + out_roll + out_yaw, // µç»ú1
-        //                 global_output + out_pitch - out_roll - out_yaw, // µç»ú2
-        //                 global_output - out_pitch + out_roll - out_yaw, // µç»ú3
-        //                 global_output - out_pitch - out_roll + out_yaw  // µç»ú4
+        // send_uart_motol(global_output + out_pitch + out_roll + out_yaw, // ç”µæœº1
+        //                 global_output + out_pitch - out_roll - out_yaw, // ç”µæœº2
+        //                 global_output - out_pitch + out_roll - out_yaw, // ç”µæœº3
+        //                 global_output - out_pitch - out_roll + out_yaw  // ç”µæœº4
         // );
 
-        // send_uart_motol(global_output - out_roll - out_pitch, // µç»ú1
-        //                 global_output - out_roll + out_pitch, // µç»ú2
-        //                 global_output + out_roll - out_pitch, // µç»ú3
-        //                 global_output + out_roll + out_pitch  // µç»ú4
+        // send_uart_motol(global_output - out_roll - out_pitch, // ç”µæœº1
+        //                 global_output - out_roll + out_pitch, // ç”µæœº2
+        //                 global_output + out_roll - out_pitch, // ç”µæœº3
+        //                 global_output + out_roll + out_pitch  // ç”µæœº4
         // );
 
         if (vl53l8cx_distance_mm >= 120 || lora3a22_uart_transfer.switch_key[2] == 1)
         {
-            // LADRC_1st_Update(adrc½á¹¹Ìå, ÆÚÍûÖµ, Êµ¼ÊÖµ, ÖÜÆÚÊ±¼ä)gyro_z_meas
+            // LADRC_1st_Update(adrcç»“æ„ä½“, æœŸæœ›å€¼, å®é™…å€¼, å‘¨æœŸæ—¶é—´)gyro_z_meas
             LADRC_1st_Update(&gyro_y_adrc, pitch_pid.output, gyro_y_meas, TIME_DELAY, MAX_DUTY);
             LADRC_1st_Update(&gyro_x_adrc, roll_pid.output, gyro_x_meas, TIME_DELAY, MAX_DUTY);
             LADRC_1st_Update(&gyro_z_adrc, yaw_pid.output, gyro_z_meas, TIME_DELAY, 20);
@@ -352,52 +416,225 @@ void pit0_ch0_isr() // ¶¨Ê±Æ÷Í¨µÀ 0 ÖÜÆÚÖĞ¶Ï·şÎñº¯Êı
 
             // typedef struct
             // {
-            //     uint8 head;      // Ö¡Í·
-            //     uint8 device_id; // Éè±¸id
+            //     uint8 head;      // å¸§å¤´
+            //     uint8 device_id; // è®¾å¤‡id
 
-            //     int16 upflow302_x;    // ¹âÁ÷_x
-            //     int16 upflow302_y;    // ¹âÁ÷_y
-            //     int16 upflow302_us;   // ¹âÁ÷_Ê±¼ä²î
-            //     int16 upflow302_us_a; // Ô¤ÁôÎ»
+            //     int16 upflow302_x;    // å…‰æµ_x
+            //     int16 upflow302_y;    // å…‰æµ_y
+            //     int16 upflow302_us;   // å…‰æµ_æ—¶é—´å·®
+            //     int16 upflow302_us_a; // é¢„ç•™ä½
 
-            //     uint8 upflow302_valid;   // ¹âÁ÷_×´Ì¬ 0²»¿ÉÓÃ  245  ¿ÉÓÃ
-            //     uint8 upflow302_version; // ¹âÁ÷_°æ±¾ºÅ
+            //     uint8 upflow302_valid;   // å…‰æµ_çŠ¶æ€ 0ä¸å¯ç”¨  245  å¯ç”¨
+            //     uint8 upflow302_version; // å…‰æµ_ç‰ˆæœ¬å·
 
-            //     uint8 sum_check; // ºÍĞ£Ñé
-            //     uint8 sum_end;   // ºÍĞ£Ñé
+            //     uint8 sum_check; // å’Œæ ¡éªŒ
+            //     uint8 sum_end;   // å’Œæ ¡éªŒ
 
             // } upflow302_receive_struct;
-            // µÈ´ı¹âÁ÷ÎÈ¶¨
+            // ç­‰å¾…å…‰æµç¨³å®š
 
-            // send_uart_motol(global_output - out_roll - out_pitch - out_yaw, // µç»ú1  ³ÉÆ·
-            //                 global_output - out_roll + out_pitch + out_yaw, // µç»ú2
-            //                 global_output + out_roll - out_pitch + out_yaw, // µç»ú3
-            //                 global_output + out_roll + out_pitch - out_yaw  // µç»ú4
+            // send_uart_motol(global_output - out_roll - out_pitch - out_yaw, // ç”µæœº1  æˆå“
+            //                 global_output - out_roll + out_pitch + out_yaw, // ç”µæœº2
+            //                 global_output + out_roll - out_pitch + out_yaw, // ç”µæœº3
+            //                 global_output + out_roll + out_pitch - out_yaw  // ç”µæœº4
             // );
-            // send_uart_motol(global_output + out_roll + out_pitch - out_yaw, // µç»ú1  ×ÔÖÆ
-            //                 global_output - out_roll + out_pitch + out_yaw, // µç»ú2
-            //                 global_output - out_roll - out_pitch - out_yaw, // µç»ú3
-            //                 global_output + out_roll - out_pitch + out_yaw  // µç»ú4
+            // send_uart_motol(global_output + out_roll + out_pitch - out_yaw, // ç”µæœº1  è‡ªåˆ¶
+            //                 global_output - out_roll + out_pitch + out_yaw, // ç”µæœº2
+            //                 global_output - out_roll - out_pitch - out_yaw, // ç”µæœº3
+            //                 global_output + out_roll - out_pitch + out_yaw  // ç”µæœº4
             // );
-            send_uart_motol(global_output + out_roll - out_pitch + out_yaw, // µç»ú1  µ±Ç°
-                            global_output - out_roll - out_pitch - out_yaw, // µç»ú2
-                            global_output + out_roll + out_pitch - out_yaw, // µç»ú3
-                            global_output - out_roll + out_pitch + out_yaw  // µç»ú4
+            send_uart_motol(global_output + out_roll - out_pitch + out_yaw, // ç”µæœº1  å½“å‰
+                            global_output - out_roll - out_pitch - out_yaw, // ç”µæœº2
+                            global_output + out_roll + out_pitch - out_yaw, // ç”µæœº3
+                            global_output - out_roll + out_pitch + out_yaw  // ç”µæœº4
             );
         }
         else /* if (dl1a_distance_mm < 150 && lora3a22_uart_transfer.switch_key[2] == 0)*/
         {
-            send_uart_motol(global_output, // µç»ú1
-                            global_output, // µç»ú2
-                            global_output, // µç»ú3
-                            global_output  // µç»ú4
+            send_uart_motol(global_output, // ç”µæœº1
+                            global_output, // ç”µæœº2
+                            global_output, // ç”µæœº3
+                            global_output  // ç”µæœº4
             );
+        }
+
+        if (0)
+        {
+        land:
+            // static uint16 land_count = 0;
+            //  ä¿¯ä»°è§’
+            // pitch_pid.desire = -lora3a22_uart_transfer.joystick[2] / 100;          // ç›®æ ‡å€¼ä¸ºæ°´å¹³
+            pitch_pid.desire = -compare_float(data_arr[1] / 10, -3.0f, 3.0f);
+            pitch_pid.measure = imu660rc_pitch;                                    // å½“å‰ä¿¯ä»°è§’
+            float gyro_y_meas = (imu660rc_gyro_y / imu660rc_transition_factor[1]); // å½“å‰Yè½´è§’é€Ÿåº¦
+
+            // æ¨ªæ»šè§’
+            // roll_pid.desire = -lora3a22_uart_transfer.joystick[3] / 100;           // ç›®æ ‡å€¼ä¸ºæ°´å¹³
+            roll_pid.desire = -compare_float((data_arr[2] / 10), -3.0f, 3.0f);
+            roll_pid.measure = imu660rc_roll;                                      // å½“å‰æ¨ªæ»šè§’
+            float gyro_x_meas = (imu660rc_gyro_x / imu660rc_transition_factor[1]); // å½“å‰Xè½´è§’é€Ÿåº¦
+
+            yaw_pid.desire = imu660rc_yaw;
+            yaw_pid.measure = 0;
+            // ç®—å‡ºä¸¤è€…çš„åŸå§‹å·®å€¼
+            float yaw_diff = yaw_pid.desire - yaw_pid.measure;
+
+            if (yaw_diff > 180.0f)
+            {
+                yaw_pid.measure += 360.0f;
+            }
+            else if (yaw_diff < -180.0f)
+            {
+                yaw_pid.measure -= 360.0f;
+            }
+
+            float gyro_z_meas = (imu660rc_gyro_z / imu660rc_transition_factor[1]); // å½“å‰Zè½´è§’é€Ÿåº¦
+
+            // è·ç¦»
+            static float filtered_gyro_distance_mm = 0;
+            filtered_gyro_distance_mm = cosf(PI / 180 * imu660rc_roll) * filtered_distance_mm * cosf(PI / 180 * imu660rc_pitch); // æ ¹æ®å§¿æ€è°ƒæ•´è·ç¦»æµ‹é‡å€¼
+
+            // å‚ç›´æ–¹å‘é€Ÿåº¦å’Œæ»¤æ³¢
+            float raw_vel_mm_s = (filtered_gyro_distance_mm - last_filtered_distance_mm) / (TIME_DELAY * 50); // tofé¢‘ç‡æ˜¯50hz
+            current_vel_mm_s = 0.8f * raw_vel_mm_s + 0.2f * current_vel_mm_s;
+            last_filtered_distance_mm = filtered_gyro_distance_mm;
+
+            // ä¸€æ¯«ç§’ç´¯åŠ ä¸€æ¬¡
+            static uint8 distance_count = 0;
+            if (distance_count < 15)
+            {
+                distance_count++;
+            }
+            else if (distance_count >= 15)
+            {
+                distance_count = 0;
+                // distance_pid.desire += lora3a22_uart_transfer.joystick[1] / 500;
+                distance_pid.desire -= 2.4;
+            }
+
+            distance_pid.desire = compare_float(distance_pid.desire, -600.0f, 1700.0f);
+
+            // global_output += lora3a22_uart_transfer.joystick[1]/1000;
+
+            // å¤–ç¯ä½¿ç”¨Pæ§åˆ¶
+            PID_Calc(&pitch_pid);
+            PID_Calc(&roll_pid);
+            PID_Calc(&yaw_pid);
+
+            float err_distance = distance_pid.desire - filtered_gyro_distance_mm; // è®¡ç®—åŸå§‹è¯¯å·®
+
+            if (err_distance > 20.0f)
+            {
+                distance_pid.measure = distance_pid.desire - (err_distance - 20.0f);
+            }
+            else if (err_distance < -20.0f)
+            {
+                distance_pid.measure = distance_pid.desire - (err_distance + 20.0f);
+            }
+            else
+            {
+
+                distance_pid.measure = distance_pid.desire;
+            }
+            // distance_pid.measure = filtered_gyro_distance_mm; // å¤–ç¯æµ‹é‡å€¼
+            velocity_pid.measure = current_vel_mm_s; // å†…ç¯æµ‹é‡å€¼
+            PID_Calc_chain(&distance_pid, &velocity_pid);
+
+            // æœ€ç»ˆå…¨å±€æ²¹é—¨ = æ‚¬åœåŸºå‡†å€¼ + ä¸²çº§å†…ç¯çš„è¾“å‡ºè¡¥å¿é‡
+            global_output = base_hover_throttle + velocity_pid.output;
+            global_output = compare_float(global_output, MIN_DUTY * 100.0f, 95 * 100.0f);
+
+            // å…¨å±€æ²¹é—¨ä½é€šæ»¤æ³¢
+            // global_output = 0.6f * global_output + 0.4f * last_global_output;
+            // last_global_output = global_output;
+            // global_output =1000;
+
+            // ä½œç”¨ç»™ç”µæœº
+            // ä¸‰è€…ä¸ºå åŠ å…³ç³» (æ ¹æ®é™€èºä»ªå’Œå››æ—‹ç¿¼çš„æ–¹ä½å…³ç³»æ¥è°ƒæ•´)
+            //   ç”µæœº1 =  ä¿¯ä»°è§’PIDè¾“å‡º + æ¨ªæ»šè§’PIDè¾“å‡º + åèˆªè§’PIDè¾“å‡º
+            //   ç”µæœº2 =  ä¿¯ä»°è§’PIDè¾“å‡º - æ¨ªæ»šè§’PIDè¾“å‡º - åèˆªè§’PIDè¾“å‡º
+            //   ç”µæœº3 = -ä¿¯ä»°è§’PIDè¾“å‡º + æ¨ªæ»šè§’PIDè¾“å‡º - åèˆªè§’PIDè¾“å‡º
+            //   ç”µæœº4 = -ä¿¯ä»°è§’PIDè¾“å‡º - æ¨ªæ»šè§’PIDè¾“å‡º + åèˆªè§’PIDè¾“å‡º
+            //   é€†æ—¶é’ˆ1111********2222é¡ºæ—¶é’ˆ
+            //         1111********2222
+            //         ****************
+            //         ****************
+            //   é¡ºæ—¶é’ˆ3333********4444é€†æ—¶é’ˆ
+            //         3333********4444
+
+            // send_uart_motol(global_output + out_pitch + out_roll + out_yaw, // ç”µæœº1
+            //                 global_output + out_pitch - out_roll - out_yaw, // ç”µæœº2
+            //                 global_output - out_pitch + out_roll - out_yaw, // ç”µæœº3
+            //                 global_output - out_pitch - out_roll + out_yaw  // ç”µæœº4
+            // );
+
+            // send_uart_motol(global_output - out_roll - out_pitch, // ç”µæœº1
+            //                 global_output - out_roll + out_pitch, // ç”µæœº2
+            //                 global_output + out_roll - out_pitch, // ç”µæœº3
+            //                 global_output + out_roll + out_pitch  // ç”µæœº4
+            // );
+
+            if (vl53l8cx_distance_mm >= 150 /*|| lora3a22_uart_transfer.switch_key[2] == 1*/)
+            {
+                // LADRC_1st_Update(adrcç»“æ„ä½“, æœŸæœ›å€¼, å®é™…å€¼, å‘¨æœŸæ—¶é—´)gyro_z_meas
+                LADRC_1st_Update(&gyro_y_adrc, pitch_pid.output, gyro_y_meas, TIME_DELAY, MAX_DUTY);
+                LADRC_1st_Update(&gyro_x_adrc, roll_pid.output, gyro_x_meas, TIME_DELAY, MAX_DUTY);
+                LADRC_1st_Update(&gyro_z_adrc, yaw_pid.output, gyro_z_meas, TIME_DELAY, 20);
+
+                out_pitch = compare_float(gyro_y_adrc.u, -MAX_DUTY * 100.0f, MAX_DUTY * 100.0f);
+                out_roll = compare_float(gyro_x_adrc.u, -MAX_DUTY * 100.0f, MAX_DUTY * 100.0f);
+                out_yaw = compare_float(gyro_z_adrc.u, -20 * 100.0f, 20 * 100.0f);
+
+                // typedef struct
+                // {
+                //     uint8 head;      // å¸§å¤´
+                //     uint8 device_id; // è®¾å¤‡id
+
+                //     int16 upflow302_x;    // å…‰æµ_x
+                //     int16 upflow302_y;    // å…‰æµ_y
+                //     int16 upflow302_us;   // å…‰æµ_æ—¶é—´å·®
+                //     int16 upflow302_us_a; // é¢„ç•™ä½
+
+                //     uint8 upflow302_valid;   // å…‰æµ_çŠ¶æ€ 0ä¸å¯ç”¨  245  å¯ç”¨
+                //     uint8 upflow302_version; // å…‰æµ_ç‰ˆæœ¬å·
+
+                //     uint8 sum_check; // å’Œæ ¡éªŒ
+                //     uint8 sum_end;   // å’Œæ ¡éªŒ
+
+                // } upflow302_receive_struct;
+                // ç­‰å¾…å…‰æµç¨³å®š
+
+                // send_uart_motol(global_output - out_roll - out_pitch - out_yaw, // ç”µæœº1  æˆå“
+                //                 global_output - out_roll + out_pitch + out_yaw, // ç”µæœº2
+                //                 global_output + out_roll - out_pitch + out_yaw, // ç”µæœº3
+                //                 global_output + out_roll + out_pitch - out_yaw  // ç”µæœº4
+                // );
+                // send_uart_motol(global_output + out_roll + out_pitch - out_yaw, // ç”µæœº1  è‡ªåˆ¶
+                //                 global_output - out_roll + out_pitch + out_yaw, // ç”µæœº2
+                //                 global_output - out_roll - out_pitch - out_yaw, // ç”µæœº3
+                //                 global_output + out_roll - out_pitch + out_yaw  // ç”µæœº4
+                // );
+                send_uart_motol(global_output + out_roll - out_pitch + out_yaw, // ç”µæœº1  å½“å‰
+                                global_output - out_roll - out_pitch - out_yaw, // ç”µæœº2
+                                global_output + out_roll + out_pitch - out_yaw, // ç”µæœº3
+                                global_output - out_roll + out_pitch + out_yaw  // ç”µæœº4
+                );
+            }
+            else /* if (dl1a_distance_mm < 150 && lora3a22_uart_transfer.switch_key[2] == 0)*/
+            {
+                // send_uart_motol(0, // ç”µæœº1
+                //                 0, // ç”µæœº2
+                //                 0, // ç”µæœº3
+                //                 0  // ç”µæœº4
+                // );
+                small_driver_set_duty(0, 0, 0, 0);
+            }
         }
     }
     else if (lora3a22_uart_transfer.switch_key[1] == 0)
     {
         small_driver_set_duty(0, 0, 0, 0);
-        // ¹éÁãÎó²îºÍÊä³ö
+        // å½’é›¶è¯¯å·®å’Œè¾“å‡º
         gyro_y_adrc.z1 = 0;
         gyro_y_adrc.z2 = 0;
         gyro_x_adrc.z1 = 0;
@@ -408,7 +645,7 @@ void pit0_ch0_isr() // ¶¨Ê±Æ÷Í¨µÀ 0 ÖÜÆÚÖĞ¶Ï·şÎñº¯Êı
         gyro_x_adrc.u = 0;
         gyro_z_adrc.u = 0;
 
-        // ¹éÁãPID
+        // å½’é›¶PID
         pitch_pid.integral = 0;
         roll_pid.integral = 0;
         yaw_pid.integral = 0;
@@ -424,18 +661,19 @@ void pit0_ch0_isr() // ¶¨Ê±Æ÷Í¨µÀ 0 ÖÜÆÚÖĞ¶Ï·şÎñº¯Êı
         velocity_pid.last_err = 0;
         current_vel_mm_s = 0;
         yaw_pid.measure = imu660rc_yaw;
-        last_filtered_distance_mm = vl53l8cx_distance_mm; // Í¬²½µ±Ç°¸ß¶È·ÀÆğ·ÉÍ»±ä
+        last_filtered_distance_mm = vl53l8cx_distance_mm; // åŒæ­¥å½“å‰é«˜åº¦é˜²èµ·é£çªå˜
         // SCB_CleanInvalidateDCache_by_Addr(&beacon_lost, sizeof(beacon_lost));
         // printf("%d\n" , beacon_lost);
         // SCB_CleanInvalidateDCache_by_Addr(car_position, sizeof(car_position));
         // printf("%d, %d\n", car_position[0], car_position[1]);
         // SCB_CleanInvalidateDCache_by_Addr(data_arr, sizeof(data_arr));
         // printf("%d, %0.2f, %0.2f\n", (int)data_arr[0], data_arr[1], data_arr[2]);
-        if (lora3a22_uart_transfer.switch_key[3] == 1){
-            send_uart_motol(1000, // µç»ú1
-                            1000, // µç»ú2
-                            1000, // µç»ú3
-                            1000  // µç»ú4
+        if (lora3a22_uart_transfer.switch_key[3] == 1)
+        {
+            send_uart_motol(2000, // ç”µæœº1
+                            2000, // ç”µæœº2
+                            2000, // ç”µæœº3
+                            2000  // ç”µæœº4
             );
         }
     }
@@ -443,174 +681,174 @@ void pit0_ch0_isr() // ¶¨Ê±Æ÷Í¨µÀ 0 ÖÜÆÚÖĞ¶Ï·şÎñº¯Êı
     // printf("%d\n", lora3a22_uart_transfer.switch_key[1]);
 }
 
-void pit0_ch1_isr() // ¶¨Ê±Æ÷Í¨µÀ 1 ÖÜÆÚÖĞ¶Ï·şÎñº¯Êı
+void pit0_ch1_isr() // å®šæ—¶å™¨é€šé“ 1 å‘¨æœŸä¸­æ–­æœåŠ¡å‡½æ•°
 {
     pit_isr_flag_clear(PIT_CH1);
-    //dl1a_get_distance();
-    // vl53l8cx_get_distance();
+    // dl1a_get_distance();
+    //  vl53l8cx_get_distance();
 
     // upflow302_receive_callback();
 }
 
-void pit0_ch2_isr() // ¶¨Ê±Æ÷Í¨µÀ 2 ÖÜÆÚÖĞ¶Ï·şÎñº¯Êı
+void pit0_ch2_isr() // å®šæ—¶å™¨é€šé“ 2 å‘¨æœŸä¸­æ–­æœåŠ¡å‡½æ•°
 {
     pit_isr_flag_clear(PIT_CH2);
 }
 
-void pit0_ch10_isr() // ¶¨Ê±Æ÷Í¨µÀ 10 ÖÜÆÚÖĞ¶Ï·şÎñº¯Êı
+void pit0_ch10_isr() // å®šæ—¶å™¨é€šé“ 10 å‘¨æœŸä¸­æ–­æœåŠ¡å‡½æ•°
 {
     pit_isr_flag_clear(PIT_CH10);
 }
 
-void pit0_ch11_isr() // ¶¨Ê±Æ÷Í¨µÀ 11 ÖÜÆÚÖĞ¶Ï·şÎñº¯Êı
+void pit0_ch11_isr() // å®šæ—¶å™¨é€šé“ 11 å‘¨æœŸä¸­æ–­æœåŠ¡å‡½æ•°
 {
     pit_isr_flag_clear(PIT_CH11);
 }
 
-void pit0_ch12_isr() // ¶¨Ê±Æ÷Í¨µÀ 12 ÖÜÆÚÖĞ¶Ï·şÎñº¯Êı
+void pit0_ch12_isr() // å®šæ—¶å™¨é€šé“ 12 å‘¨æœŸä¸­æ–­æœåŠ¡å‡½æ•°
 {
     pit_isr_flag_clear(PIT_CH12);
 }
 
-void pit0_ch13_isr() // ¶¨Ê±Æ÷Í¨µÀ 13 ÖÜÆÚÖĞ¶Ï·şÎñº¯Êı
+void pit0_ch13_isr() // å®šæ—¶å™¨é€šé“ 13 å‘¨æœŸä¸­æ–­æœåŠ¡å‡½æ•°
 {
     pit_isr_flag_clear(PIT_CH13);
 }
 
-void pit0_ch14_isr() // ¶¨Ê±Æ÷Í¨µÀ 14 ÖÜÆÚÖĞ¶Ï·şÎñº¯Êı
+void pit0_ch14_isr() // å®šæ—¶å™¨é€šé“ 14 å‘¨æœŸä¸­æ–­æœåŠ¡å‡½æ•°
 {
     pit_isr_flag_clear(PIT_CH14);
 }
 
-void pit0_ch15_isr() // ¶¨Ê±Æ÷Í¨µÀ 15 ÖÜÆÚÖĞ¶Ï·şÎñº¯Êı
+void pit0_ch15_isr() // å®šæ—¶å™¨é€šé“ 15 å‘¨æœŸä¸­æ–­æœåŠ¡å‡½æ•°
 {
     pit_isr_flag_clear(PIT_CH15);
 }
 
-void pit0_ch16_isr() // ¶¨Ê±Æ÷Í¨µÀ 16 ÖÜÆÚÖĞ¶Ï·şÎñº¯Êı
+void pit0_ch16_isr() // å®šæ—¶å™¨é€šé“ 16 å‘¨æœŸä¸­æ–­æœåŠ¡å‡½æ•°
 {
     pit_isr_flag_clear(PIT_CH16);
 }
 
-void pit0_ch17_isr() // ¶¨Ê±Æ÷Í¨µÀ 17 ÖÜÆÚÖĞ¶Ï·şÎñº¯Êı
+void pit0_ch17_isr() // å®šæ—¶å™¨é€šé“ 17 å‘¨æœŸä¸­æ–­æœåŠ¡å‡½æ•°
 {
     pit_isr_flag_clear(PIT_CH17);
 }
 
-void pit0_ch18_isr() // ¶¨Ê±Æ÷Í¨µÀ 18 ÖÜÆÚÖĞ¶Ï·şÎñº¯Êı
+void pit0_ch18_isr() // å®šæ—¶å™¨é€šé“ 18 å‘¨æœŸä¸­æ–­æœåŠ¡å‡½æ•°
 {
     pit_isr_flag_clear(PIT_CH18);
 }
 
-void pit0_ch19_isr() // ¶¨Ê±Æ÷Í¨µÀ 19 ÖÜÆÚÖĞ¶Ï·şÎñº¯Êı
+void pit0_ch19_isr() // å®šæ—¶å™¨é€šé“ 19 å‘¨æœŸä¸­æ–­æœåŠ¡å‡½æ•°
 {
     pit_isr_flag_clear(PIT_CH19);
 }
 
-void pit0_ch20_isr() // ¶¨Ê±Æ÷Í¨µÀ 20 ÖÜÆÚÖĞ¶Ï·şÎñº¯Êı
+void pit0_ch20_isr() // å®šæ—¶å™¨é€šé“ 20 å‘¨æœŸä¸­æ–­æœåŠ¡å‡½æ•°
 {
     pit_isr_flag_clear(PIT_CH20);
 }
 
-void pit0_ch21_isr() // ¶¨Ê±Æ÷Í¨µÀ 21 ÖÜÆÚÖĞ¶Ï·şÎñº¯Êı
+void pit0_ch21_isr() // å®šæ—¶å™¨é€šé“ 21 å‘¨æœŸä¸­æ–­æœåŠ¡å‡½æ•°
 {
     pit_isr_flag_clear(PIT_CH21);
     tsl1401_collect_pit_handler();
 }
-// **************************** PITÖĞ¶Ïº¯Êı ****************************
+// **************************** PITä¸­æ–­å‡½æ•° ****************************
 
-// **************************** ´®¿ÚÖĞ¶Ïº¯Êı ****************************
-// ´®¿Ú0Ä¬ÈÏ×÷Îªµ÷ÊÔ´®¿Ú
+// **************************** ä¸²å£ä¸­æ–­å‡½æ•° ****************************
+// ä¸²å£0é»˜è®¤ä½œä¸ºè°ƒè¯•ä¸²å£
 void uart0_isr(void)
 {
-    if (uart_isr_mask(UART_0)) // ´®¿Ú0½ÓÊÕÖĞ¶Ï
+    if (uart_isr_mask(UART_0)) // ä¸²å£0æ¥æ”¶ä¸­æ–­
     {
 
-#if DEBUG_UART_USE_INTERRUPT       // Èç¹û¿ªÆô debug ´®¿ÚÖĞ¶Ï
-        debug_interrupr_handler(); // µ÷ÓÃ debug ´®¿Ú½ÓÊÕ´¦Àíº¯Êı Êı¾İ»á±» debug »·ĞÎ»º³åÇø¶ÁÈ¡
-#endif                             // Èç¹ûĞŞ¸ÄÁË DEBUG_UART_INDEX ÄÇÕâ¶Î´úÂëĞèÒª·Åµ½¶ÔÓ¦µÄ´®¿ÚÖĞ¶ÏÈ¥
+#if DEBUG_UART_USE_INTERRUPT       // å¦‚æœå¼€å¯ debug ä¸²å£ä¸­æ–­
+        debug_interrupr_handler(); // è°ƒç”¨ debug ä¸²å£æ¥æ”¶å¤„ç†å‡½æ•° æ•°æ®ä¼šè¢« debug ç¯å½¢ç¼“å†²åŒºè¯»å–
+#endif                             // å¦‚æœä¿®æ”¹äº† DEBUG_UART_INDEX é‚£è¿™æ®µä»£ç éœ€è¦æ”¾åˆ°å¯¹åº”çš„ä¸²å£ä¸­æ–­å»
     }
-    else // ´®¿Ú0·¢ËÍÖĞ¶Ï
+    else // ä¸²å£0å‘é€ä¸­æ–­
     {
     }
 }
 
 void uart1_isr(void)
 {
-    if (uart_isr_mask(UART_1)) // ´®¿Ú1½ÓÊÕÖĞ¶Ï
+    if (uart_isr_mask(UART_1)) // ä¸²å£1æ¥æ”¶ä¸­æ–­
     {
 
-        wireless_module_uart_handler(); // ÎŞÏßÄ£¿éÍ³Ò»»Øµ÷º¯Êı
+        wireless_module_uart_handler(); // æ— çº¿æ¨¡å—ç»Ÿä¸€å›è°ƒå‡½æ•°
     }
-    else // ´®¿Ú1·¢ËÍÖĞ¶Ï
+    else // ä¸²å£1å‘é€ä¸­æ–­
     {
     }
 }
 
 void uart2_isr(void)
 {
-    if (uart_isr_mask(UART_2)) // ´®¿Ú2½ÓÊÕÖĞ¶Ï
+    if (uart_isr_mask(UART_2)) // ä¸²å£2æ¥æ”¶ä¸­æ–­
     {
-        gnss_uart_callback(); // GPSÄ£¿é»Øµ÷º¯Êı
+        gnss_uart_callback(); // GPSæ¨¡å—å›è°ƒå‡½æ•°
     }
-    else // ´®¿Ú2·¢ËÍÖĞ¶Ï
+    else // ä¸²å£2å‘é€ä¸­æ–­
     {
     }
 }
 
 void uart3_isr(void)
 {
-    if (uart_isr_mask(UART_3)) // ´®¿Ú3½ÓÊÕÖĞ¶Ï
+    if (uart_isr_mask(UART_3)) // ä¸²å£3æ¥æ”¶ä¸­æ–­
     {
     }
-    else // ´®¿Ú3·¢ËÍÖĞ¶Ï
+    else // ä¸²å£3å‘é€ä¸­æ–­
     {
     }
 }
 
 void uart4_isr(void)
 {
-    if (uart_isr_mask(UART_4)) // ´®¿Ú4½ÓÊÕÖĞ¶Ï
+    if (uart_isr_mask(UART_4)) // ä¸²å£4æ¥æ”¶ä¸­æ–­
     {
 
-        uart_receiver_handler(); // ´®¿Ú½ÓÊÕ»ú»Øµ÷º¯Êı
+        uart_receiver_handler(); // ä¸²å£æ¥æ”¶æœºå›è°ƒå‡½æ•°
     }
-    else // ´®¿Ú4·¢ËÍÖĞ¶Ï
+    else // ä¸²å£4å‘é€ä¸­æ–­
     {
     }
 }
 
 void uart5_isr(void)
 {
-    if (uart_isr_mask(UART_5)) // ´®¿Ú5½ÓÊÕÖĞ¶Ï
+    if (uart_isr_mask(UART_5)) // ä¸²å£5æ¥æ”¶ä¸­æ–­
     {
     }
-    else // ´®¿Ú5·¢ËÍÖĞ¶Ï
+    else // ä¸²å£5å‘é€ä¸­æ–­
     {
     }
 }
 
 void uart6_isr(void)
 {
-    if (uart_isr_mask(UART_6)) // ´®¿Ú6½ÓÊÕÖĞ¶Ï
+    if (uart_isr_mask(UART_6)) // ä¸²å£6æ¥æ”¶ä¸­æ–­
     {
 
         wireless_module_uart_handler();
     }
-    else // ´®¿Ú6·¢ËÍÖĞ¶Ï
+    else // ä¸²å£6å‘é€ä¸­æ–­
     {
     }
 }
-// **************************** ´®¿ÚÖĞ¶Ïº¯Êı ****************************
+// **************************** ä¸²å£ä¸­æ–­å‡½æ•° ****************************
 
-// **************************** Íâ²¿ÖĞ¶Ïº¯Êı ****************************
-void gpio_0_exti_isr() // Íâ²¿ GPIO_0 ÖĞ¶Ï·şÎñº¯Êı
+// **************************** å¤–éƒ¨ä¸­æ–­å‡½æ•° ****************************
+void gpio_0_exti_isr() // å¤–éƒ¨ GPIO_0 ä¸­æ–­æœåŠ¡å‡½æ•°
 {
 }
 
-void gpio_1_exti_isr() // Íâ²¿ GPIO_1 ÖĞ¶Ï·şÎñº¯Êı
+void gpio_1_exti_isr() // å¤–éƒ¨ GPIO_1 ä¸­æ–­æœåŠ¡å‡½æ•°
 {
-    if (exti_flag_get(P01_0)) // Ê¾ÀıP1_0¶Ë¿ÚÍâ²¿ÖĞ¶ÏÅĞ¶Ï
+    if (exti_flag_get(P01_0)) // ç¤ºä¾‹P1_0ç«¯å£å¤–éƒ¨ä¸­æ–­åˆ¤æ–­
     {
     }
     if (exti_flag_get(P01_1))
@@ -618,7 +856,7 @@ void gpio_1_exti_isr() // Íâ²¿ GPIO_1 ÖĞ¶Ï·şÎñº¯Êı
     }
 }
 
-void gpio_2_exti_isr() // Íâ²¿ GPIO_2 ÖĞ¶Ï·şÎñº¯Êı
+void gpio_2_exti_isr() // å¤–éƒ¨ GPIO_2 ä¸­æ–­æœåŠ¡å‡½æ•°
 {
     if (exti_flag_get(P02_0))
     {
@@ -628,51 +866,51 @@ void gpio_2_exti_isr() // Íâ²¿ GPIO_2 ÖĞ¶Ï·şÎñº¯Êı
     }
 }
 
-void gpio_3_exti_isr() // Íâ²¿ GPIO_3 ÖĞ¶Ï·şÎñº¯Êı
+void gpio_3_exti_isr() // å¤–éƒ¨ GPIO_3 ä¸­æ–­æœåŠ¡å‡½æ•°
 {
 }
 
-void gpio_4_exti_isr() // Íâ²¿ GPIO_4 ÖĞ¶Ï·şÎñº¯Êı
+void gpio_4_exti_isr() // å¤–éƒ¨ GPIO_4 ä¸­æ–­æœåŠ¡å‡½æ•°
 {
 }
 
-void gpio_5_exti_isr() // Íâ²¿ GPIO_5 ÖĞ¶Ï·şÎñº¯Êı
+void gpio_5_exti_isr() // å¤–éƒ¨ GPIO_5 ä¸­æ–­æœåŠ¡å‡½æ•°
 {
 }
 
-void gpio_6_exti_isr() // Íâ²¿ GPIO_6 ÖĞ¶Ï·şÎñº¯Êı
+void gpio_6_exti_isr() // å¤–éƒ¨ GPIO_6 ä¸­æ–­æœåŠ¡å‡½æ•°
 {
 }
 
-void gpio_7_exti_isr() // Íâ²¿ GPIO_7 ÖĞ¶Ï·şÎñº¯Êı
+void gpio_7_exti_isr() // å¤–éƒ¨ GPIO_7 ä¸­æ–­æœåŠ¡å‡½æ•°
 {
 }
 
-void gpio_8_exti_isr() // Íâ²¿ GPIO_8 ÖĞ¶Ï·şÎñº¯Êı
+void gpio_8_exti_isr() // å¤–éƒ¨ GPIO_8 ä¸­æ–­æœåŠ¡å‡½æ•°
 {
 }
 
-void gpio_9_exti_isr() // Íâ²¿ GPIO_9 ÖĞ¶Ï·şÎñº¯Êı
+void gpio_9_exti_isr() // å¤–éƒ¨ GPIO_9 ä¸­æ–­æœåŠ¡å‡½æ•°
 {
 }
 
-void gpio_10_exti_isr() // Íâ²¿ GPIO_10 ÖĞ¶Ï·şÎñº¯Êı
+void gpio_10_exti_isr() // å¤–éƒ¨ GPIO_10 ä¸­æ–­æœåŠ¡å‡½æ•°
 {
 }
 
-void gpio_11_exti_isr() // Íâ²¿ GPIO_11 ÖĞ¶Ï·şÎñº¯Êı
+void gpio_11_exti_isr() // å¤–éƒ¨ GPIO_11 ä¸­æ–­æœåŠ¡å‡½æ•°
 {
 }
 
-void gpio_12_exti_isr() // Íâ²¿ GPIO_12 ÖĞ¶Ï·şÎñº¯Êı
+void gpio_12_exti_isr() // å¤–éƒ¨ GPIO_12 ä¸­æ–­æœåŠ¡å‡½æ•°
 {
 }
 
-void gpio_13_exti_isr() // Íâ²¿ GPIO_13 ÖĞ¶Ï·şÎñº¯Êı
+void gpio_13_exti_isr() // å¤–éƒ¨ GPIO_13 ä¸­æ–­æœåŠ¡å‡½æ•°
 {
 }
 
-void gpio_14_exti_isr() // Íâ²¿ GPIO_14 ÖĞ¶Ï·şÎñº¯Êı
+void gpio_14_exti_isr() // å¤–éƒ¨ GPIO_14 ä¸­æ–­æœåŠ¡å‡½æ•°
 {
 
     if (exti_flag_get(P14_5))
@@ -681,59 +919,59 @@ void gpio_14_exti_isr() // Íâ²¿ GPIO_14 ÖĞ¶Ï·şÎñº¯Êı
     }
 }
 
-void gpio_15_exti_isr() // Íâ²¿ GPIO_15 ÖĞ¶Ï·şÎñº¯Êı
+void gpio_15_exti_isr() // å¤–éƒ¨ GPIO_15 ä¸­æ–­æœåŠ¡å‡½æ•°
 {
 }
 
-void gpio_16_exti_isr() // Íâ²¿ GPIO_16 ÖĞ¶Ï·şÎñº¯Êı
+void gpio_16_exti_isr() // å¤–éƒ¨ GPIO_16 ä¸­æ–­æœåŠ¡å‡½æ•°
 {
 }
 
-void gpio_17_exti_isr() // Íâ²¿ GPIO_17 ÖĞ¶Ï·şÎñº¯Êı
+void gpio_17_exti_isr() // å¤–éƒ¨ GPIO_17 ä¸­æ–­æœåŠ¡å‡½æ•°
 {
 }
 
-void gpio_18_exti_isr() // Íâ²¿ GPIO_18 ÖĞ¶Ï·şÎñº¯Êı
+void gpio_18_exti_isr() // å¤–éƒ¨ GPIO_18 ä¸­æ–­æœåŠ¡å‡½æ•°
 {
 }
 
-void gpio_19_exti_isr() // Íâ²¿ GPIO_19 ÖĞ¶Ï·şÎñº¯Êı
+void gpio_19_exti_isr() // å¤–éƒ¨ GPIO_19 ä¸­æ–­æœåŠ¡å‡½æ•°
 {
 }
 
-void gpio_20_exti_isr() // Íâ²¿ GPIO_20 ÖĞ¶Ï·şÎñº¯Êı
+void gpio_20_exti_isr() // å¤–éƒ¨ GPIO_20 ä¸­æ–­æœåŠ¡å‡½æ•°
 {
 }
 
-void gpio_21_exti_isr() // Íâ²¿ GPIO_21 ÖĞ¶Ï·şÎñº¯Êı
+void gpio_21_exti_isr() // å¤–éƒ¨ GPIO_21 ä¸­æ–­æœåŠ¡å‡½æ•°
 {
 }
 
-void gpio_22_exti_isr() // Íâ²¿ GPIO_22 ÖĞ¶Ï·şÎñº¯Êı
+void gpio_22_exti_isr() // å¤–éƒ¨ GPIO_22 ä¸­æ–­æœåŠ¡å‡½æ•°
 {
 }
 
-void gpio_23_exti_isr() // Íâ²¿ GPIO_23 ÖĞ¶Ï·şÎñº¯Êı
+void gpio_23_exti_isr() // å¤–éƒ¨ GPIO_23 ä¸­æ–­æœåŠ¡å‡½æ•°
 {
 }
-// **************************** Íâ²¿ÖĞ¶Ïº¯Êı ****************************
+// **************************** å¤–éƒ¨ä¸­æ–­å‡½æ•° ****************************
 
 void send_uart_motol(float duty1, float duty2, float duty3, float duty4)
 {
-    // È¡¸ºÒòÎªpidÊä³ö·´ÁË
-    // output_duty1 = -duty1 * (PWM_DUTY_MAX / 100); // ¼ÆËãÊä³öÕ¼¿Õ±È
-    // output_duty2 = -duty2 * (PWM_DUTY_MAX / 100); // ¼ÆËãÊä³öÕ¼¿Õ±È
-    // output_duty3 = -duty3 * (PWM_DUTY_MAX / 100); // ¼ÆËãÊä³öÕ¼¿Õ±È
-    // output_duty4 = -duty4 * (PWM_DUTY_MAX / 100); // ¼ÆËãÊä³öÕ¼¿Õ±È
-    output_duty1 = compare_float(duty1, MIN_DUTY * 100.0f, MAX_DUTY * 100.0f); // ¼ÆËãÊä³öÕ¼¿Õ±È
-    output_duty2 = compare_float(duty2, MIN_DUTY * 100.0f, MAX_DUTY * 100.0f); // ¼ÆËãÊä³öÕ¼¿Õ±È
-    output_duty3 = compare_float(duty3, MIN_DUTY * 100.0f, MAX_DUTY * 100.0f); // ¼ÆËãÊä³öÕ¼¿Õ±È
-    output_duty4 = compare_float(duty4, MIN_DUTY * 100.0f, MAX_DUTY * 100.0f); // ¼ÆËãÊä³öÕ¼¿Õ±È
+    // å–è´Ÿå› ä¸ºpidè¾“å‡ºåäº†
+    // output_duty1 = -duty1 * (PWM_DUTY_MAX / 100); // è®¡ç®—è¾“å‡ºå ç©ºæ¯”
+    // output_duty2 = -duty2 * (PWM_DUTY_MAX / 100); // è®¡ç®—è¾“å‡ºå ç©ºæ¯”
+    // output_duty3 = -duty3 * (PWM_DUTY_MAX / 100); // è®¡ç®—è¾“å‡ºå ç©ºæ¯”
+    // output_duty4 = -duty4 * (PWM_DUTY_MAX / 100); // è®¡ç®—è¾“å‡ºå ç©ºæ¯”
+    output_duty1 = compare_float(duty1, MIN_DUTY * 100.0f, MAX_DUTY * 100.0f); // è®¡ç®—è¾“å‡ºå ç©ºæ¯”
+    output_duty2 = compare_float(duty2, MIN_DUTY * 100.0f, MAX_DUTY * 100.0f); // è®¡ç®—è¾“å‡ºå ç©ºæ¯”
+    output_duty3 = compare_float(duty3, MIN_DUTY * 100.0f, MAX_DUTY * 100.0f); // è®¡ç®—è¾“å‡ºå ç©ºæ¯”
+    output_duty4 = compare_float(duty4, MIN_DUTY * 100.0f, MAX_DUTY * 100.0f); // è®¡ç®—è¾“å‡ºå ç©ºæ¯”
 
-    output_duty1 = dir1 ? output_duty1 : -output_duty1; // ¸ù¾İ·½Ïòµ÷ÕûÕ¼¿Õ±È
-    output_duty2 = dir2 ? output_duty2 : -output_duty2; // ¸ù¾İ·½Ïòµ÷ÕûÕ¼¿Õ±È
-    output_duty3 = dir3 ? output_duty3 : -output_duty3; // ¸ù¾İ·½Ïòµ÷ÕûÕ¼¿Õ±È
-    output_duty4 = dir4 ? output_duty4 : -output_duty4; // ¸ù¾İ·½Ïòµ÷ÕûÕ¼¿Õ±È
+    output_duty1 = dir1 ? output_duty1 : -output_duty1; // æ ¹æ®æ–¹å‘è°ƒæ•´å ç©ºæ¯”
+    output_duty2 = dir2 ? output_duty2 : -output_duty2; // æ ¹æ®æ–¹å‘è°ƒæ•´å ç©ºæ¯”
+    output_duty3 = dir3 ? output_duty3 : -output_duty3; // æ ¹æ®æ–¹å‘è°ƒæ•´å ç©ºæ¯”
+    output_duty4 = dir4 ? output_duty4 : -output_duty4; // æ ¹æ®æ–¹å‘è°ƒæ•´å ç©ºæ¯”
 
     // printf("duty: %5d  ,  %5d  ,  %5d  ,  %5d  \r\n", output_duty1, output_duty2, output_duty3, output_duty4);
 
