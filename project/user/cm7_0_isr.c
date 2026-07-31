@@ -101,9 +101,10 @@ void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
         imu660rc_get_gyro();
         imu660rc_get_acc();
 
-        uint8 no_start = 0;
+        static uint8 no_start = 0;
         static int16 no_start_angle = 0;
         static int16 no_start_count = 0;
+        static float filtered_gyro_distance_mm = 0;
 
         // vl53l8cx_get_data();
         // vl53l8cx_get_center_distance(&dist); // 获取中心区域平均距离
@@ -157,17 +158,21 @@ void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
         // yaw_pid.measure = -lora3a22_uart_transfer.joystick[0] / 100;           // 当前偏航角
         // float gyro_z_meas = (imu660rc_gyro_z / imu660rc_transition_factor[1]); // 当前Z轴角速度
 
-        if(no_start == 0){
-            yaw_pid.desire = imu660rc_yaw;                                         
+        if (no_start == 0 && filtered_gyro_distance_mm >= 1000) // 高度得大于1000
+        {
+            yaw_pid.desire = imu660rc_yaw;
             yaw_pid.measure = no_start_angle;
-            if(no_start_count < 20){
+            if (no_start_count < 20)
+            {
                 no_start_count++;
-            }else
+            }
+            else
             {
                 no_start_count = 0;
                 no_start_angle += 1;
             }
-            if(no_start_angle > 370){
+            if (no_start_angle > 370)
+            {
                 no_start = 1;
             }
             goto nostart;
@@ -184,100 +189,104 @@ void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
         static uint8 last_beacon_status = 1;
         static uint8 land_start = 0;
         float target_yaw = base_search_yaw;
-        if (land_timer > 8000) // 等待八秒
+        if (no_start == 1)
         {
-            data_arr[3] = land_start;
-            goto land;
-        }
 
-        if (data_arr[0] == 1) // 识别到了信标
-        {
-            lost_timer = 0;
-            if (beacon_real_loast > 200)
-            { // 防止将小车突然被识别成信标(留大概5帧
-                land_timer = 0;
+            if (land_timer > 8000) // 等待八秒
+            {
+                data_arr[3] = land_start;
+                goto land;
             }
 
-            if (last_beacon_status == 0) // 上一次是丢失状态
+            if (data_arr[0] == 1) // 识别到了信标
+            {
+                lost_timer = 0;
+                if (beacon_real_loast > 200)
+                { // 防止将小车突然被识别成信标(留大概5帧
+                    land_timer = 0;
+                }
+
+                if (last_beacon_status == 0) // 上一次是丢失状态
+                {
+                    beacon_real_loast = 0;
+                    beacon_timer = 0;
+                    last_beacon_status = 1;
+                }
+                else
+                {
+                    beacon_real_loast++;
+                    beacon_timer++;
+                    if (beacon_timer > 100)
+                    {
+                        beacon_timer = 0;
+                        base_search_yaw = imu660rc_yaw; // 记录当前偏航角作为基准
+                    }
+                }
+
+                target_yaw = imu660rc_yaw;
+                // 重置搜索状态，为下一次丢失做准备
+                last_beacon_status = 1;
+                search_timer = 0;
+                search_state = 0;
+                search_start = 0;
+            }
+            else if (data_arr[0] == 0) // 未识别到信标
             {
                 beacon_real_loast = 0;
                 beacon_timer = 0;
-                last_beacon_status = 1;
-            }
-            else
-            {
-                beacon_real_loast++;
-                beacon_timer++;
-                if (beacon_timer > 100)
+                if (last_beacon_status == 1)
                 {
-                    beacon_timer = 0;
-                    base_search_yaw = imu660rc_yaw; // 记录当前偏航角作为基准
-                }
-            }
-
-            target_yaw = imu660rc_yaw;
-            // 重置搜索状态，为下一次丢失做准备
-            last_beacon_status = 1;
-            search_timer = 0;
-            search_state = 0;
-            search_start = 0;
-        }
-        else if (data_arr[0] == 0) // 未识别到信标
-        {
-            beacon_real_loast = 0;
-            beacon_timer = 0;
-            if (last_beacon_status == 1)
-            {
-                // base_search_yaw = imu660rc_yaw;
-                // target_yaw = base_search_yaw;
-                // 粗略计算灭灯次数
-                land_start += 1;
-                if (land_start > 10)
-                {
-                    land_start = 10;
-                }
-                last_beacon_status = 0;
-                search_timer = 0;
-                search_start = 0;
-                search_state = 0;
-            }
-            else
-            {
-                if (land_start == 10)
-                {
-                    land_timer++;
-                }
-
-                lost_timer++;
-                if (lost_timer > 100 && search_start == 0)
-                {
-                    lost_timer = 0;
-                    search_start = 1;
-                    search_state = !search_state;
-                }
-                if (search_start == 1)
-                {
-                    search_timer++;
-
-                    if (search_timer > 1500)
+                    // base_search_yaw = imu660rc_yaw;
+                    // target_yaw = base_search_yaw;
+                    // 粗略计算灭灯次数
+                    land_start += 1;
+                    if (land_start > 10)
                     {
-                        search_timer = 0;
+                        land_start = 10;
+                    }
+                    last_beacon_status = 0;
+                    search_timer = 0;
+                    search_start = 0;
+                    search_state = 0;
+                }
+                else
+                {
+                    if (land_start == 10)
+                    {
+                        land_timer++;
+                    }
+
+                    lost_timer++;
+                    if (lost_timer > 100 && search_start == 0)
+                    {
+                        lost_timer = 0;
+                        search_start = 1;
                         search_state = !search_state;
                     }
-
-                    if (search_state == 0)
+                    if (search_start == 1)
                     {
-                        target_yaw = base_search_yaw;
-                    }
-                    else
-                    {
-                        target_yaw = base_search_yaw + 130.0f;
-                    }
+                        search_timer++;
 
-                    if (target_yaw > 180.0f)
-                        target_yaw -= 360.0f;
-                    else if (target_yaw < -180.0f)
-                        target_yaw += 360.0f;
+                        if (search_timer > 1500)
+                        {
+                            search_timer = 0;
+                            search_state = !search_state;
+                        }
+
+                        if (search_state == 0)
+                        {
+                            target_yaw = base_search_yaw;
+                        }
+                        else
+                        {
+                            target_yaw = base_search_yaw + 130.0f;
+                        }
+
+                        if (target_yaw > 180.0f)
+                            target_yaw -= 360.0f;
+                        else if (target_yaw < -180.0f)
+                            target_yaw += 360.0f;
+                    }
                 }
             }
         }
@@ -294,10 +303,10 @@ void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
         //     yaw_pid.measure -= lora3a22_uart_transfer.joystick[0] / 500.0f; // 累加摇杆量作为目标
         // }
         yaw_pid.measure = target_yaw;
-        // yaw_pid.measure = 0;
-        nostart:
+    // yaw_pid.measure = 0;
+    nostart:
 
-            // 算出两者的原始差值
+        // 算出两者的原始差值
         float yaw_diff = yaw_pid.desire - yaw_pid.measure;
 
         if (yaw_diff > 180.0f)
@@ -312,7 +321,7 @@ void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
         float gyro_z_meas = (imu660rc_gyro_z / imu660rc_transition_factor[1]); // 当前Z轴角速度
 
         // 距离
-        static float filtered_gyro_distance_mm = 0;
+
         filtered_gyro_distance_mm = cosf(PI / 180 * imu660rc_roll) * filtered_distance_mm * cosf(PI / 180 * imu660rc_pitch); // 根据姿态调整距离测量值
 
         // 垂直方向速度和滤波
@@ -621,7 +630,6 @@ void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
                 small_driver_set_duty(0, 0, 0, 0);
             }
         }
-
     }
     else if (lora3a22_uart_transfer.switch_key[1] == 0)
     {
