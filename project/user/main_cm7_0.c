@@ -59,6 +59,7 @@ extern PID_Struct velocity_pid;
 extern float global_output;
 extern float voltage;
 extern bool flow_complete;
+extern volatile uint8 tof_new_flag;
 
 
 int main(void)
@@ -89,10 +90,20 @@ int main(void)
     while (true)
     {
         vl53l8cx_get_distance();
+        tof_new_flag = 1; // notify 1kHz ISR for one altitude-hold update
         // 此处编写需要循环执行的代码
         // printf("Data:%0.2f,   %0.2f,   %0.2f\n", imu660rc_pitch, imu660rc_roll, imu660rc_yaw);
         // printf("Data:%0.2f,   %0.2f,   %0.2f\n", imu660rc_acc_x, imu660rc_acc_y, imu660rc_acc_z);
-        printf("Data:%0.2f,   %0.2f,   %0.2f,   %0.2f,    %d\n", distance_pid.output, velocity_pid.output, global_output, distance_pid.desire, vl53l8cx_distance_mm);
+        static uint8 print_count = 0;
+        if (print_count >= 5) // lower print rate (~10Hz) to avoid serial stalling the TOF poll period
+        {
+            print_count = 0;
+            printf("Data:%0.2f,   %0.2f,   %0.2f,   %0.2f,    %d\n", distance_pid.output, velocity_pid.output, global_output, distance_pid.desire, vl53l8cx_distance_mm);
+        }
+        else
+        {
+            print_count++;
+        }
         // printf("out:%0.2f   ,%0.2f   ,%0.2f \r\n", out_roll, out_pitch, out_yaw);
 
         // ADC测电压 1秒一次

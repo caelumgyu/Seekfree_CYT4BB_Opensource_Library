@@ -61,6 +61,10 @@ int16 dist;
 float last_filtered_distance_mm = 0; // 记录上一次高度求微分
 float current_vel_mm_s = 0;          // 当前垂直速度
 float base_hover_throttle = 6800.0f; // 基础悬停油门
+volatile uint8 tof_new_flag = 0;     // TOF 新数据标志（主循环置位，定高计算消费）
+uint32 last_tof_ms = 0;              // 上一次定高计算时的毫秒时间戳（用于实测 dt）
+static uint32 isr_ms = 0;            // 1kHz 中断毫秒计数
+static float filtered_distance_mm = 0; // TOF 距离低通滤波（50Hz 更新）
 #pragma location = 0x28001014
 __no_init float data_arr[4];
 // __no_init uint32 beacon_lost;
@@ -73,9 +77,9 @@ PID_Struct pitch_pid = {.Kp = 2.4f, .Ki = 0.00f, .Kd = 0.00f, .out_min = -2000.0
 PID_Struct roll_pid = {.Kp = 2.4f, .Ki = 0.00f, .Kd = 0.00f, .out_min = -2000.0f, .out_max = 2000.0f};
 PID_Struct yaw_pid = {.Kp = 0.8f, .Ki = 0.00f, .Kd = 0.00f, .out_min = -800.0f, .out_max = 800.0f};
 
-// 定高
-PID_Struct distance_pid = {.Kp = 1.2f, .Ki = 0.0f, .Kd = 0.0004f, .out_min = -1200.0f, .out_max = 1200.0f, .desire = 200.0f};
-PID_Struct velocity_pid = {.Kp = 2.8f, .Ki = 0.0f, .Kd = 0.024f, .out_min = -2700.0f, .out_max = 2700.0f};
+// 定高（外环 Ki 补偿悬停油门偏差：PID_Calc 积分项乘 PID_PERIOD=0.001，外环 50Hz 执行，等效 0.1 duty/s/每mm误差；内环 Kd 先置 0，速度测量修好前只会放大噪声）
+PID_Struct distance_pid = {.Kp = 1.2f, .Ki = 2.0f, .Kd = 0.0f, .out_min = -1200.0f, .out_max = 1200.0f, .desire = 200.0f};
+PID_Struct velocity_pid = {.Kp = 2.8f, .Ki = 0.0f, .Kd = 0.0f, .out_min = -2700.0f, .out_max = 2700.0f};
 
 // 跟车
 PID_Struct position_x_pid = {.Kp = 0.068f, .Ki = 0.0f, .Kd = 0.000012f, .out_min = -8.0f, .out_max = 8.0f};
@@ -94,6 +98,7 @@ void send_uart_motol(float duty1, float duty2, float duty3, float duty4);
 void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
 {
     pit_isr_flag_clear(PIT_CH0);
+    isr_ms++;
 
     // 遥控器拨码开关
     if (lora3a22_uart_transfer.switch_key[1] == 1)
@@ -111,10 +116,7 @@ void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
         // if (dist == 65535)
         //     dist = 149;
 
-        // TOF低通滤波
-        static float filtered_distance_mm = 0;
-        // filtered_distance_mm = 0.4f * dl1a_distance_mm + 0.6f * filtered_distance_mm;
-        filtered_distance_mm = 0.6f * vl53l8cx_distance_mm + 0.4f * filtered_distance_mm;
+        // TOF低通滤波已移到 50Hz 门控定高计算中（见下方 tof_new_flag 段），1kHz 下滤波无意义
 
         // static uint8 count = 0;
         // if(count > 100){
@@ -320,16 +322,8 @@ void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
 
         float gyro_z_meas = (imu660rc_gyro_z / imu660rc_transition_factor[1]); // 当前Z轴角速度
 
-        // 距离
-
-        filtered_gyro_distance_mm = cosf(PI / 180 * imu660rc_roll) * filtered_distance_mm * cosf(PI / 180 * imu660rc_pitch); // 根据姿态调整距离测量值
-
-        // 垂直方向速度和滤波
-        float raw_vel_mm_s = (filtered_gyro_distance_mm - last_filtered_distance_mm) / (TIME_DELAY * 50); // tof频率是50hz
-        current_vel_mm_s = 0.8f * raw_vel_mm_s + 0.2f * current_vel_mm_s;
-        last_filtered_distance_mm = filtered_gyro_distance_mm;
-
-        // 一毫秒累加一次
+        // ===== 定高（50Hz，由 TOF 新数据门控；I2C 读取保留在主循环，中断内不做阻塞通信）=====
+        // 一毫秒累加一次（摇杆微调目标高度）
         static uint8 distance_count = 0;
         if (distance_count < 15)
         {
@@ -343,40 +337,39 @@ void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
 
         distance_pid.desire = compare_float(distance_pid.desire, -600.0f, 2000.0f);
 
-        // global_output += lora3a22_uart_transfer.joystick[1]/1000;
-
-        // 外环使用P控制
+        // 姿态外环保持 1kHz
         PID_Calc(&pitch_pid);
         PID_Calc(&roll_pid);
         PID_Calc(&yaw_pid);
 
-        float err_distance = distance_pid.desire - filtered_gyro_distance_mm; // 计算原始误差
-
-        if (err_distance > 20.0f)
+        if (tof_new_flag)
         {
-            distance_pid.measure = distance_pid.desire - (err_distance - 20.0f);
-        }
-        else if (err_distance < -20.0f)
-        {
-            distance_pid.measure = distance_pid.desire - (err_distance + 20.0f);
-        }
-        else
-        {
+            tof_new_flag = 0;
 
-            distance_pid.measure = distance_pid.desire;
+            // 实测采样间隔 dt，避免主循环 printf 等造成的周期抖动
+            float dt = (isr_ms - last_tof_ms) / 1000.0f;
+            last_tof_ms = isr_ms;
+            if (dt > 0.05f) dt = 0.05f; // 异常间隔限幅
+            if (dt < 0.01f) dt = 0.02f;
+
+            // 50Hz 低通滤波 + 姿态修正
+            filtered_distance_mm = 0.5f * vl53l8cx_distance_mm + 0.5f * filtered_distance_mm;
+            filtered_gyro_distance_mm = cosf(PI / 180 * imu660rc_roll) * filtered_distance_mm * cosf(PI / 180 * imu660rc_pitch); // 根据姿态调整距离测量值
+
+            // 垂直速度：实测 dt 微分 + 低通滤波
+            float raw_vel_mm_s = (filtered_gyro_distance_mm - last_filtered_distance_mm) / dt;
+            current_vel_mm_s = 0.4f * raw_vel_mm_s + 0.6f * current_vel_mm_s;
+            last_filtered_distance_mm = filtered_gyro_distance_mm;
+
+            // 外环（去掉 ±20mm 死区，避免死区内零增益导致的极限环）+ 内环串级
+            distance_pid.measure = filtered_gyro_distance_mm; // 外环测量值
+            velocity_pid.measure = current_vel_mm_s;          // 内环测量值
+            PID_Calc_chain(&distance_pid, &velocity_pid);
+
+            // 最终全局油门 = 悬停基准值 + 串级内环的输出补偿量
+            global_output = base_hover_throttle + velocity_pid.output;
+            global_output = compare_float(global_output, MIN_DUTY * 100.0f, 95 * 100.0f);
         }
-        // distance_pid.measure = filtered_gyro_distance_mm; // 外环测量值
-        velocity_pid.measure = current_vel_mm_s; // 内环测量值
-        PID_Calc_chain(&distance_pid, &velocity_pid);
-
-        // 最终全局油门 = 悬停基准值 + 串级内环的输出补偿量
-        global_output = base_hover_throttle + velocity_pid.output;
-        global_output = compare_float(global_output, MIN_DUTY * 100.0f, 95 * 100.0f);
-
-        // 全局油门低通滤波
-        // global_output = 0.6f * global_output + 0.4f * last_global_output;
-        // last_global_output = global_output;
-        // global_output =1000;
 
         // 作用给电机
         // 三者为叠加关系 (根据陀螺仪和四旋翼的方位关系来调整)
@@ -662,6 +655,10 @@ void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
         current_vel_mm_s = 0;
         yaw_pid.measure = imu660rc_yaw;
         last_filtered_distance_mm = vl53l8cx_distance_mm; // 同步当前高度防起飞突变
+        filtered_distance_mm = vl53l8cx_distance_mm;      // 同步滤波状态，防起飞突变
+        current_vel_mm_s = 0;                             // 归零垂直速度
+        tof_new_flag = 0;                                 // 丢弃悬挂的旧数据标志
+        last_tof_ms = isr_ms;                             // 重置 dt 基准
         // SCB_CleanInvalidateDCache_by_Addr(&beacon_lost, sizeof(beacon_lost));
         // printf("%d\n" , beacon_lost);
         // SCB_CleanInvalidateDCache_by_Addr(car_position, sizeof(car_position));
