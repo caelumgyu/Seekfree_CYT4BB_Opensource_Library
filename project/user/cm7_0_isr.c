@@ -77,9 +77,9 @@ PID_Struct pitch_pid = {.Kp = 2.4f, .Ki = 0.00f, .Kd = 0.00f, .out_min = -2000.0
 PID_Struct roll_pid = {.Kp = 2.4f, .Ki = 0.00f, .Kd = 0.00f, .out_min = -2000.0f, .out_max = 2000.0f};
 PID_Struct yaw_pid = {.Kp = 0.8f, .Ki = 0.00f, .Kd = 0.00f, .out_min = -800.0f, .out_max = 800.0f};
 
-// 定高（外环 Ki 补偿悬停油门偏差：PID_Calc 积分项乘 PID_PERIOD=0.001，外环 50Hz 执行，等效 0.1 duty/s/每mm误差；内环 Kd 先置 0，速度测量修好前只会放大噪声）
-PID_Struct distance_pid = {.Kp = 1.2f, .Ki = 2.0f, .Kd = 0.0f, .out_min = -1200.0f, .out_max = 1200.0f, .desire = 200.0f};
-PID_Struct velocity_pid = {.Kp = 2.8f, .Ki = 0.0f, .Kd = 0.0f, .out_min = -2700.0f, .out_max = 2700.0f};
+// 定高（period=0.02s 对应 50Hz 执行；外环 Ki=0.1 即每秒每 mm 误差增加 0.1 油门，用于补偿悬停油门偏差；内环 Kd 先置 0，速度测量修好前只会放大噪声）
+PID_Struct distance_pid = {.Kp = 1.2f, .Ki = 0.1f, .Kd = 0.0f, .period = 0.02f, .out_min = -1200.0f, .out_max = 1200.0f, .desire = 200.0f};
+PID_Struct velocity_pid = {.Kp = 2.8f, .Ki = 0.0f, .Kd = 0.0f, .period = 0.02f, .out_min = -2700.0f, .out_max = 2700.0f};
 
 // 跟车
 PID_Struct position_x_pid = {.Kp = 0.068f, .Ki = 0.0f, .Kd = 0.000012f, .out_min = -8.0f, .out_max = 8.0f};

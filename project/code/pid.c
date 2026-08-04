@@ -3,6 +3,9 @@
 // 单次PID计算
 void PID_Calc(PID_Struct *pid)
 {
+    // 每个 PID 使用自己的计算周期（秒）；未设置（<=0）时回退到默认 1ms
+    float period = (pid->period > 0.0f) ? pid->period : PID_PERIOD;
+
     pid->err = pid->desire - pid->measure; // 计算误差
     pid->integral += pid->err;             // 积分累积
 
@@ -11,9 +14,9 @@ void PID_Calc(PID_Struct *pid)
         pid->last_err = pid->err; // 第一次计算时，微分项为0
     }
 
-    float der = pid->err - pid->last_err;                                                                     // 微分项
-    pid->output = pid->Kp * pid->err + (pid->Ki * pid->integral * PID_PERIOD) + (pid->Kd * der / PID_PERIOD); // PID输出
-    pid->last_err = pid->err;                                                                                 // 更新上次误差
+    float der = pid->err - pid->last_err;                                                           // 微分项
+    pid->output = pid->Kp * pid->err + (pid->Ki * pid->integral * period) + (pid->Kd * der / period); // PID输出
+    pid->last_err = pid->err;                                                                       // 更新上次误差
 
     // 抗积分饱和: 输出超限时钳位输出并回退同向积分
     if (pid->out_max > pid->out_min)
