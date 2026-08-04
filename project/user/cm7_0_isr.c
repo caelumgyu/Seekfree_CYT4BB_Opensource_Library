@@ -101,9 +101,9 @@ void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
         imu660rc_get_gyro();
         imu660rc_get_acc();
 
-        static uint8 no_start = 0;
-        static int16 no_start_angle = 0;
-        static int16 no_start_count = 0;
+        // static uint8 no_start = 0;
+        // static int16 no_start_angle = 0;
+        // static int16 no_start_count = 0;
         static float filtered_gyro_distance_mm = 0;
 
         // vl53l8cx_get_data();
@@ -158,25 +158,25 @@ void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
         // yaw_pid.measure = -lora3a22_uart_transfer.joystick[0] / 100;           // 当前偏航角
         // float gyro_z_meas = (imu660rc_gyro_z / imu660rc_transition_factor[1]); // 当前Z轴角速度
 
-        if (no_start == 0 && filtered_gyro_distance_mm >= 1000) // 高度得大于1000
-        {
-            yaw_pid.desire = imu660rc_yaw;
-            yaw_pid.measure = no_start_angle;
-            if (no_start_count < 20)
-            {
-                no_start_count++;
-            }
-            else
-            {
-                no_start_count = 0;
-                no_start_angle += 1;
-            }
-            if (no_start_angle > 370)
-            {
-                no_start = 1;
-            }
-            goto nostart;
-        }
+        // if (no_start == 0 && filtered_gyro_distance_mm >= 1000) // 高度得大于1000
+        // {
+        //     yaw_pid.desire = imu660rc_yaw;
+        //     yaw_pid.measure = no_start_angle;
+        //     if (no_start_count < 20)
+        //     {
+        //         no_start_count++;
+        //     }
+        //     else
+        //     {
+        //         no_start_count = 0;
+        //         no_start_angle += 1;
+        //     }
+        //     if (no_start_angle > 360)
+        //     {
+        //         no_start = 1;
+        //     }
+        //     goto nostart;
+        // }
 
         static float base_search_yaw = 0.0f;
         static uint16 search_timer = 0;
@@ -189,8 +189,8 @@ void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
         static uint8 last_beacon_status = 1;
         static uint8 land_start = 0;
         float target_yaw = base_search_yaw;
-        if (no_start == 1)
-        {
+        // if (no_start == 1)
+        // {
 
             if (land_timer > 8000) // 等待八秒
             {
@@ -289,7 +289,7 @@ void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
                     }
                 }
             }
-        }
+        //}
         // 偏航角
         yaw_pid.desire = imu660rc_yaw; // 当前IMU偏航角 (-180到180)
         // static uint8 yaw_count = 0;
@@ -304,7 +304,7 @@ void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
         // }
         yaw_pid.measure = target_yaw;
     // yaw_pid.measure = 0;
-    nostart:
+    // nostart:
 
         // 算出两者的原始差值
         float yaw_diff = yaw_pid.desire - yaw_pid.measure;
