@@ -43,10 +43,10 @@
 #include "small_driver_uart_control.h"
 
 bool flow_complete = false;
-bool dir1 = false; // 一般情况下true会让电机顺时针旋转
+bool dir1 = true;  // 一般情况下true会让电机顺时针旋转
 bool dir2 = true;  // 但是具体情况还要看电机的接线方式，可能需要调整
-bool dir3 = false; // 这里的电机1因为接线不同导致反转，所以设置为false，其他三个电机接线方式相同，所以设置为true
-bool dir4 = false; // 如果陀螺仪数据与预期的旋转方向相反，可以通过调整这些方向变量来修正
+bool dir3 = true;  // 这里的电机1因为接线不同导致反转，所以设置为false，其他三个电机接线方式相同，所以设置为true
+bool dir4 = true;  // 如果陀螺仪数据与预期的旋转方向相反，可以通过调整这些方向变量来修正
 int16_t output_duty1 = 0;
 int16_t output_duty2 = 0;
 int16_t output_duty3 = 0;
@@ -60,7 +60,7 @@ int16 dist;
 
 float last_filtered_distance_mm = 0; // 记录上一次高度求微分
 float current_vel_mm_s = 0;          // 当前垂直速度
-float base_hover_throttle = 6800.0f; // 基础悬停油门
+float base_hover_throttle = 6400.0f; // 基础悬停油门
 volatile uint8 tof_new_flag = 0;     // TOF 新数据标志（主循环置位，定高计算消费）
 uint32 last_tof_ms = 0;              // 上一次定高计算时的毫秒时间戳（用于实测 dt）
 static uint32 isr_ms = 0;            // 1kHz 中断毫秒计数
@@ -78,17 +78,17 @@ PID_Struct roll_pid = {.Kp = 2.4f, .Ki = 0.00f, .Kd = 0.00f, .period = TIME_DELA
 PID_Struct yaw_pid = {.Kp = 0.8f, .Ki = 0.00f, .Kd = 0.00f, .period = TIME_DELAY, .out_min = -800.0f, .out_max = 800.0f};
 
 // 定高（period=0.02s 对应 50Hz 执行；外环 Ki=0.1 即每秒每 mm 误差增加 0.1 油门，用于补偿悬停油门偏差；内环 Kd 先置 0，速度测量修好前只会放大噪声）
-PID_Struct distance_pid = {.Kp = 1.2f, .Ki = 0.1f, .Kd = 0.0f, .period = 0.02f, .out_min = -1200.0f, .out_max = 1200.0f, .desire = 200.0f};
-PID_Struct velocity_pid = {.Kp = 2.8f, .Ki = 0.0f, .Kd = 0.0f, .period = 0.02f, .out_min = -2700.0f, .out_max = 2700.0f};
+PID_Struct distance_pid = {.Kp = 1.4f, .Ki = 0.00001f, .Kd = 0.0f, .period = 0.02f, .out_min = -1200.0f, .out_max = 1200.0f, .desire = 200.0f};
+PID_Struct velocity_pid = {.Kp = 1.6f, .Ki = 0.0f, .Kd = 0.0f, .period = 0.02f, .out_min = -1600.0f, .out_max = 2700.0f};
 
 // 跟车
 PID_Struct position_x_pid = {.Kp = 0.068f, .Ki = 0.0f, .Kd = 0.000012f, .period = TIME_DELAY, .out_min = -8.0f, .out_max = 8.0f};
 PID_Struct position_y_pid = {.Kp = 0.068f, .Ki = 0.0f, .Kd = 0.000012f, .period = TIME_DELAY, .out_min = -8.0f, .out_max = 8.0f};
 
 PID_Struct acc_y_pid = {.Kp = 0.8f, .Ki = 0.00f, .Kd = 0.00f, .period = TIME_DELAY, .out_min = -2000.0f, .out_max = 2000.0f};
-LADRC_1st_Struct gyro_y_adrc = {.b0 = 3.8f, .wo = 88.0f, .wc = 6.8f, .z1 = 0, .z2 = 0}; // 俯仰角速度
-LADRC_1st_Struct gyro_x_adrc = {.b0 = 3.8f, .wo = 98.0f, .wc = 7.2f, .z1 = 0, .z2 = 0}; // 横滚角速度
-LADRC_1st_Struct gyro_z_adrc = {.b0 = 3.2f, .wo = 58.0f, .wc = 4.8f, .z1 = 0, .z2 = 0}; // 偏航角速度
+LADRC_1st_Struct gyro_y_adrc = {.b0 = 4.6f, .wo = 88.0f, .wc = 6.8f, .z1 = 0, .z2 = 0}; // 俯仰角速度
+LADRC_1st_Struct gyro_x_adrc = {.b0 = 4.6f, .wo = 98.0f, .wc = 7.2f, .z1 = 0, .z2 = 0}; // 横滚角速度
+LADRC_1st_Struct gyro_z_adrc = {.b0 = 4.0f, .wo = 58.0f, .wc = 4.8f, .z1 = 0, .z2 = 0}; // 偏航角速度
 
 // LADRC_1st_Struct *LADRC_p[3] = {&gyro_x_adrc, &gyro_y_adrc, &gyro_z_adrc};
 
@@ -305,8 +305,8 @@ void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
         //     yaw_pid.measure -= lora3a22_uart_transfer.joystick[0] / 500.0f; // 累加摇杆量作为目标
         // }
         yaw_pid.measure = target_yaw;
-    // yaw_pid.measure = 0;
-    // nostart:
+        // yaw_pid.measure = 0;
+        // nostart:
 
         // 算出两者的原始差值
         float yaw_diff = yaw_pid.desire - yaw_pid.measure;
