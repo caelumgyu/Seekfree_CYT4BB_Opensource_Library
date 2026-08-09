@@ -3,12 +3,6 @@
     <Tool>
         <Name>linker</Name>
         <Parent>
-            <Path>C:\Code\CYT4BB7_Library-master\CYT4BB7_Library-master\Seekfree_CYT4BB_Opensource_Library\project\iar\project_config\Debug_m7_0\Exe\cyt4bb7_cm_7_0.out</Path>
-            <Output>
-                <Path>C:\Code\CYT4BB7_Library-master\CYT4BB7_Library-master\Seekfree_CYT4BB_Opensource_Library\project\iar\Debug_m7_0\List\cyt4bb7_cm_7_0.map</Path>
-            </Output>
-        </Parent>
-        <Parent>
             <Path>C:\Code\beifen\old\CYT4BB7_Library-master\Seekfree_CYT4BB_Opensource_Library\project\iar\project_config\Debug_m7_0\Exe\cyt4bb7_cm_7_0.out</Path>
             <Output>
                 <Path>C:\Code\beifen\old\CYT4BB7_Library-master\Seekfree_CYT4BB_Opensource_Library\project\iar\Debug_m7_0\List\cyt4bb7_cm_7_0.map</Path>

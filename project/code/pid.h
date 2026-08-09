@@ -11,6 +11,7 @@ typedef struct
     float Kp;       // 比例系数
     float Ki;       // 积分系数
     float Kd;       // 微分系数
+    float period;   // 本 PID 的计算周期（秒）；<=0 时回退到 PID_PERIOD（1ms）
     float err;      // 当前误差
     float desire;   // 目标值
     float measure;  // 测量值
