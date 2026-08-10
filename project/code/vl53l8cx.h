@@ -20,7 +20,7 @@
 #define VL53L8CX_HARD_IIC_SCB_SEL                            (5)                 // SCB 编号：1=SCB1(P18), 4=SCB4(P06), 5=SCB5(P07)
 #define VL53L8CX_HARD_IIC_SCL_PIN                           (P07_2)
 #define VL53L8CX_HARD_IIC_SDA_PIN                           (P07_1)
-#define VL53L8CX_HARD_IIC_SPEED_HZ                          (1000000)            // IIC 速率 400kHz
+#define VL53L8CX_HARD_IIC_SPEED_HZ                          (400000)            // IIC 速率 400kHz
 //====================================================定义 硬件 IIC 参数====================================================
 #elif (VL53L8CX_COMM_MODE == 2) // 硬件 SPI
 //====================================================定义 硬件 SPI 参数====================================================
@@ -46,7 +46,7 @@
 
 #define VL53L8CX_DEV_ADDR                                   (0x52 >> 1)         // 7 位 IIC 设备地址（SPI 模式下不使用）
 
-#define VL53L8CX_RANGING_FREQ_HZ                            (50)                // 测距频率 Hz（4x4 模式下合法范围 1~60）
+#define VL53L8CX_RANGING_FREQ_HZ                            (60)                // 测距频率 Hz（4x4 模式下合法范围 1~60）
 //=================================================定义 VL53L8CX 模块 配置参数================================================
 
 

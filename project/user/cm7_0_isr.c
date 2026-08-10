@@ -60,7 +60,7 @@ int16 dist;
 
 float last_filtered_distance_mm = 0; // 记录上一次高度求微分
 float current_vel_mm_s = 0;          // 当前垂直速度
-float base_hover_throttle = 6400.0f; // 基础悬停油门
+float base_hover_throttle = 6600.0f; // 基础悬停油门
 volatile uint8 tof_new_flag = 0;     // TOF 新数据标志（主循环置位，定高计算消费）
 uint32 last_tof_ms = 0;              // 上一次定高计算时的毫秒时间戳（用于实测 dt）
 static uint32 isr_ms = 0;            // 1kHz 中断毫秒计数
@@ -78,8 +78,8 @@ PID_Struct roll_pid = {.Kp = 2.4f, .Ki = 0.00f, .Kd = 0.00f, .period = TIME_DELA
 PID_Struct yaw_pid = {.Kp = 0.8f, .Ki = 0.00f, .Kd = 0.00f, .period = TIME_DELAY, .out_min = -800.0f, .out_max = 800.0f};
 
 // 定高（period=0.02s 对应 50Hz 执行；外环 Ki=0.1 即每秒每 mm 误差增加 0.1 油门，用于补偿悬停油门偏差；内环 Kd 先置 0，速度测量修好前只会放大噪声）
-PID_Struct distance_pid = {.Kp = 1.4f, .Ki = 0.00001f, .Kd = 0.0f, .period = 0.02f, .out_min = -1200.0f, .out_max = 1200.0f, .desire = 200.0f};
-PID_Struct velocity_pid = {.Kp = 1.6f, .Ki = 0.0f, .Kd = 0.0f, .period = 0.02f, .out_min = -1600.0f, .out_max = 2700.0f};
+PID_Struct distance_pid = {.Kp = 2.4f, .Ki = 0.00001f, .Kd = 0.0f, .period = 0.02f, .out_min = -1200.0f, .out_max = 1200.0f, .desire = 200.0f};
+PID_Struct velocity_pid = {.Kp = 2.4f, .Ki = 0.002f, .Kd = 0.0f, .period = 0.02f, .out_min = -1800.0f, .out_max = 2700.0f};
 
 // 跟车
 PID_Struct position_x_pid = {.Kp = 0.068f, .Ki = 0.0f, .Kd = 0.000012f, .period = TIME_DELAY, .out_min = -8.0f, .out_max = 8.0f};
@@ -502,7 +502,7 @@ void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
             {
                 distance_count = 0;
                 // distance_pid.desire += lora3a22_uart_transfer.joystick[1] / 500;
-                distance_pid.desire -= 2.4;
+                distance_pid.desire -= 1;
             }
 
             distance_pid.desire = compare_float(distance_pid.desire, -600.0f, 1700.0f);
