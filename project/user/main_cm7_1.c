@@ -49,7 +49,7 @@
 #define max_scan_line (width * height)
 
 #define THRESH_LOW 80
-#define THRESH_MID 100
+#define THRESH_MID 60
 #define THRESH_CAR 180
 #define THRESH_HIGH 255
 
@@ -342,9 +342,8 @@ Blob detect_beacon(BeaconTracker *tracker, Blob *exclude_beacon, Blob *car)
                 int w = (b.max_x - b.min_x) + 1;
                 int h = (b.max_y - b.min_y) + 1;
 
-                if (b.area > 1 && b.area < 150 && w > 0 && h > 0)
+                if (b.area > 1 && b.area < 180 && w > 0 && h > 0)
                 {
-
                     if (exclude_beacon != NULL && exclude_beacon->area > 0)
                     {
                         float dist = sqrt((b.cx - exclude_beacon->cx) * (b.cx - exclude_beacon->cx) + (b.cy - exclude_beacon->cy) * (b.cy - exclude_beacon->cy));
@@ -357,7 +356,7 @@ Blob detect_beacon(BeaconTracker *tracker, Blob *exclude_beacon, Blob *car)
                     float aspect_ratio = (float)w / h;
                     int bounding_box_area = w * h;
                     float fill_ratio = (float)b.area / bounding_box_area;
-                    if ((w < 4 && h < 2) || (w < 2 && h < 4)) // 极远处信标
+                    if ((w < 8 && h < 4) || (w < 4 && h < 8) && (94 - b.cx > 80 || 94 - b.cx < -80)) // 极远处信标
                     {
                         goto check_beacon;
                     }
