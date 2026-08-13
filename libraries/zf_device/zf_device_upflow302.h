@@ -48,7 +48,7 @@
 #include "zf_common_headfile.h"
 
 
-#define UP_FLOW_302_UART_INDEX            (UART_2)              // 定义 UP-FLOW-302 光流模块 使用的串口
+#define UP_FLOW_302_UART_INDEX            (UART_1)              // 定义 UP-FLOW-302 光流模块 使用的串口
 #define UP_FLOW_302_BAUDRATE              (19200)               // 指定 UP-FLOW-302 光流模块 串口所使用的的串口波特率 (用户不可修改)
 #define UP_FLOW_302_TX_PIN                (UART1_RX_P04_0)      // UP-FLOW-302 光流模块 的 TX 引脚 连接单片机的 RX 引脚 
 #define UP_FLOW_302_RX_PIN                (UART1_TX_P04_1)      // UP-FLOW-302 光流模块 的 RX 引脚 连接单片机的 TX 引脚 

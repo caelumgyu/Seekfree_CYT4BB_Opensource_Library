@@ -78,7 +78,7 @@ int main(void)
     gpio_init(P19_0, GPO, GPIO_HIGH, GPO_PUSH_PULL);
     adc_init(ADC0_CH21_P07_5, ADC_12BIT);
 
-    pit_ms_init(PIT_CH1, TIME_DELAY * 1000 * 20); // 用于获取tof和光流
+    // pit_ms_init(PIT_CH1, TIME_DELAY * 1000 * 20); // 用于获取tof和光流
     pit_ms_init(PIT_CH0, TIME_DELAY * 1000);
     // 遥控器按键状态
     //pit_ms_init(PIT_CH1, 10);
@@ -94,33 +94,33 @@ int main(void)
         // 此处编写需要循环执行的代码
         // printf("Data:%0.2f,   %0.2f,   %0.2f\n", imu660rc_pitch, imu660rc_roll, imu660rc_yaw);
         // printf("Data:%0.2f,   %0.2f,   %0.2f\n", imu660rc_acc_x, imu660rc_acc_y, imu660rc_acc_z);
-        static uint8 print_count = 0;
-        if (print_count >= 5) // lower print rate (~10Hz) to avoid serial stalling the TOF poll period
-        {
-            print_count = 0;
-            printf("Data:%0.2f,   %0.2f,   %0.2f,   %0.2f,    %d\n", distance_pid.output, velocity_pid.output, global_output, distance_pid.desire, vl53l8cx_distance_mm);
-        }
-        else
-        {
-            print_count++;
-        }
+        // static uint8 print_count = 0;
+        // if (print_count >= 5) // lower print rate (~10Hz) to avoid serial stalling the TOF poll period
+        // {
+        //     print_count = 0;
+        //     printf("Data:%0.2f,   %0.2f,   %0.2f,   %0.2f,    %d\n", distance_pid.output, velocity_pid.output, global_output, distance_pid.desire, vl53l8cx_distance_mm);
+        // }
+        // else
+        // {
+        //     print_count++;
+        // }
         // printf("out:%0.2f   ,%0.2f   ,%0.2f \r\n", out_roll, out_pitch, out_yaw);
 
         // ADC测电压 1秒一次
-        static uint8 adc_count = 0;
-        if (adc_count < 50)
-        {
-            adc_count++;
-        }
-        else
-        {
-            adc_count = 0;
-            adc_value = adc_mean_filter_convert(ADC0_CH21_P07_5, 10);
-            voltage = (adc_value) * (223.0f / 20.0f) * (3.3f / 4096.0f);
-            // printf("Voltage:%0.2f\n", voltage);
-        }
+        // static uint8 adc_count = 0;
+        // if (adc_count < 50)
+        // {
+        //     adc_count++;
+        // }
+        // else
+        // {
+        //     adc_count = 0;
+        //     adc_value = adc_mean_filter_convert(ADC0_CH21_P07_5, 10);
+        //     voltage = (adc_value) * (223.0f / 20.0f) * (3.3f / 4096.0f);
+        //     // printf("Voltage:%0.2f\n", voltage);
+        // }
 
-        system_delay_ms(20);
+        system_delay_ms(10);
         // 此处编写需要循环执行的代码
     }
 }
