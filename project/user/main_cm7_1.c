@@ -335,7 +335,7 @@ Blob detect_beacon(BeaconTracker *tracker, Blob *exclude_beacon, Blob *car)
                 if (car != NULL && car->area > 0)
                 {
                     float dist1 = sqrt((b.cx - car->cx) * (b.cx - car->cx) + (b.cy - car->cy) * (b.cy - car->cy));
-                    if (dist1 < 8.0f)
+                    if (dist1 < 12.0f)
                         continue;
                 }
 
