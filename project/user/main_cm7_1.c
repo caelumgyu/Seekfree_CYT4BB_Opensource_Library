@@ -49,7 +49,7 @@
 #define max_scan_line (width * height)
 
 #define THRESH_LOW 80
-#define THRESH_MID 60
+#define THRESH_MID 100
 #define THRESH_CAR 180
 #define THRESH_HIGH 255
 
