@@ -50,7 +50,7 @@
 
 #define THRESH_LOW 80
 #define THRESH_MID 100
-#define THRESH_CAR 180
+#define THRESH_CAR 200
 #define THRESH_HIGH 255
 
 #define WIFI_OPEN 0
@@ -335,7 +335,11 @@ Blob detect_beacon(BeaconTracker *tracker, Blob *exclude_beacon, Blob *car)
                 if (car != NULL && car->area > 0)
                 {
                     float dist1 = sqrt((b.cx - car->cx) * (b.cx - car->cx) + (b.cy - car->cy) * (b.cy - car->cy));
-                    if (dist1 < 12.0f)
+                    if (b.area < 30 && dist1 < 18.0f)
+                    {
+                        continue;
+                    }
+                    if (dist1 < 10.0f)
                         continue;
                 }
 
@@ -352,6 +356,7 @@ Blob detect_beacon(BeaconTracker *tracker, Blob *exclude_beacon, Blob *car)
                             continue;
                         }
                     }
+
 
                     float aspect_ratio = (float)w / h;
                     int bounding_box_area = w * h;
@@ -540,7 +545,7 @@ void calculate_pca(Blob *blob)
 int main(void)
 {
     clock_init(SYSTEM_CLOCK_250M); // 时钟配置及系统初始化<务必保留>
-    debug_info_init();             // 调试串口信息初始化
+    // debug_info_init();             // 调试串口信息初始化
 
     // 此处编写用户代码 例如外设初始化代码等
     mt9v03x_init();
@@ -746,11 +751,23 @@ int main(void)
         
         if (data_arr[3] < 10)
         {
+            // float dir_err = 0.0f;
+            // // 车当前方向与摄像头x正方向的夹角误差, 单位: 度, 范围 -180 ~ +180
+            // if (car.area > 0)
+            // {
+            //     dir_err = atan2f(car.dir_y, car.dir_x) * 57.2957795f;
+            // }
+            // else
+            // {
+            //     dir_err = atan2f(last_car_dir_y, last_car_dir_x) * 57.2957795f;
+            // }
+            // sprintf(car_dat, "%0.1f,%0.1f,%0.1f\n", err_fwd, err_lat,dir_err);
             sprintf(car_dat, "%0.1f,%0.1f\n", err_fwd, err_lat);
             // printf("%s  ,  %0.2f,   %0.2f\n",car_dat,beacon1.cx,beacon1.cy);
             uart_write_string(UART_4, car_dat);
         }
         else{
+            // sprintf(car_dat, "0.0,0.0,0.0\n");
             sprintf(car_dat, "0.0,0.0\n");
             uart_write_string(UART_4, car_dat);
         }
