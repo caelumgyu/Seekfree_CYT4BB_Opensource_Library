@@ -43,10 +43,10 @@
 #include "small_driver_uart_control.h"
 
 bool flow_complete = false;
-bool dir1 = true; // 一般情况下true会让电机顺时针旋转
-bool dir2 = true; // 但是具体情况还要看电机的接线方式，可能需要调整
-bool dir3 = true; // 这里的电机1因为接线不同导致反转，所以设置为false，其他三个电机接线方式相同，所以设置为true
-bool dir4 = true; // 如果陀螺仪数据与预期的旋转方向相反，可以通过调整这些方向变量来修正
+bool dir1 = false; // 一般情况下true会让电机顺时针旋转
+bool dir2 = false; // 但是具体情况还要看电机的接线方式，可能需要调整
+bool dir3 = false; // 这里的电机1因为接线不同导致反转，所以设置为false，其他三个电机接线方式相同，所以设置为true
+bool dir4 = false; // 如果陀螺仪数据与预期的旋转方向相反，可以通过调整这些方向变量来修正
 int16_t output_duty1 = 0;
 int16_t output_duty2 = 0;
 int16_t output_duty3 = 0;
@@ -60,9 +60,15 @@ int16 dist;
 
 float last_filtered_distance_mm = 0;   // 记录上一次高度求微分
 float current_vel_mm_s = 0;            // 当前垂直速度
-float base_hover_throttle = 6600.0f;   // 基础悬停油门
+float base_hover_throttle = 4500.0f;   // 基础悬停油门
 volatile uint8 tof_new_flag = 0;       // TOF 新数据标志（主循环置位，定高计算消费）
+uint8 op_new_flag = 0;                 // 光流新数据标志
 uint32 last_tof_ms = 0;                // 上一次定高计算时的毫秒时间戳（用于实测 dt）
+
+// 跟车串级PID：光流只做速度环（不累积位置，避免积分漂移）
+// 位置误差由视觉信标 data_arr 提供，每帧刷新、有界、不漂移
+static float flow_vel_x = 0.0f, flow_vel_y = 0.0f;   // 光流瞬时速度（低通滤波后）
+static uint8  flow_valid_count = 0;                  // 光流有效帧计数（用于起飞前等待稳定）
 static uint32 isr_ms = 0;              // 1kHz 中断毫秒计数
 static float filtered_distance_mm = 0; // TOF 距离低通滤波（50Hz 更新）
 #pragma location = 0x28001014
@@ -75,20 +81,22 @@ __no_init float data_arr[4];
 // PID结构体(先调内环，后调外环)
 PID_Struct pitch_pid = {.Kp = 2.4f, .Ki = 0.00f, .Kd = 0.00f, .period = TIME_DELAY, .out_min = -2000.0f, .out_max = 2000.0f};
 PID_Struct roll_pid = {.Kp = 2.4f, .Ki = 0.00f, .Kd = 0.00f, .period = TIME_DELAY, .out_min = -2000.0f, .out_max = 2000.0f};
-PID_Struct yaw_pid = {.Kp = 0.8f, .Ki = 0.00f, .Kd = 0.00f, .period = TIME_DELAY, .out_min = -800.0f, .out_max = 800.0f};
+PID_Struct yaw_pid = {.Kp = 0.8f, .Ki = 0.00f, .Kd = 0.00f, .period = TIME_DELAY, .out_min = -1000.0f, .out_max = 1000.0f};
 
 // 定高（period=0.02s 对应 50Hz 执行；外环 Ki=0.1 即每秒每 mm 误差增加 0.1 油门，用于补偿悬停油门偏差；内环 Kd 先置 0，速度测量修好前只会放大噪声）
-PID_Struct distance_pid = {.Kp = 2.4f, .Ki = 0.00001f, .Kd = 0.0f, .period = 0.02f, .out_min = -1200.0f, .out_max = 1200.0f, .desire = 200.0f};
-PID_Struct velocity_pid = {.Kp = 2.4f, .Ki = 0.002f, .Kd = 0.0f, .period = 0.02f, .out_min = -1800.0f, .out_max = 2700.0f};
+PID_Struct distance_pid = {.Kp = 1.8f, .Ki = 0.12f, .Kd = 0.0f, .period = 0.02f, .out_min = -1200.0f, .out_max = 1200.0f, .desire = 200.0f};
+PID_Struct velocity_pid = {.Kp = 2.5f, .Ki = 0.0f, .Kd = 0.0f, .period = 0.02f, .out_min = -2400.0f, .out_max = 3600.0f};
 
 // 跟车
-PID_Struct position_x_pid = {.Kp = 0.068f, .Ki = 0.0f, .Kd = 0.000012f, .period = 0.02f, .out_min = -8.0f, .out_max = 8.0f};
-PID_Struct position_y_pid = {.Kp = 0.068f, .Ki = 0.0f, .Kd = 0.000012f, .period = 0.02f, .out_min = -8.0f, .out_max = 8.0f};
+PID_Struct position_x_pid = {.Kp = 0.36f, .Ki = 0.0f, .Kd = 0.0f, .period = 0.02f, .out_min = -8.0f, .out_max = 8.0f};
+PID_Struct position_y_pid = {.Kp = 0.36f, .Ki = 0.0f, .Kd = 0.0f, .period = 0.02f, .out_min = -8.0f, .out_max = 8.0f};
+PID_Struct car_velocity_x_pid = {.Kp = 0.084f, .Ki = 0.0f, .Kd = 0.0f, .period = 0.02f, .out_min = -8.0f, .out_max = 8.0f};
+PID_Struct car_velocity_y_pid = {.Kp = 0.084f, .Ki = 0.0f, .Kd = 0.0f, .period = 0.02f, .out_min = -8.0f, .out_max = 8.0f};
 
 PID_Struct acc_y_pid = {.Kp = 0.8f, .Ki = 0.00f, .Kd = 0.00f, .period = TIME_DELAY, .out_min = -2000.0f, .out_max = 2000.0f};
-LADRC_1st_Struct gyro_y_adrc = {.b0 = 4.6f, .wo = 88.0f, .wc = 6.8f, .z1 = 0, .z2 = 0}; // 俯仰角速度
-LADRC_1st_Struct gyro_x_adrc = {.b0 = 4.6f, .wo = 98.0f, .wc = 7.2f, .z1 = 0, .z2 = 0}; // 横滚角速度
-LADRC_1st_Struct gyro_z_adrc = {.b0 = 4.0f, .wo = 58.0f, .wc = 4.8f, .z1 = 0, .z2 = 0}; // 偏航角速度
+LADRC_1st_Struct gyro_y_adrc = {.b0 = 6.4f, .wo = 86.0f, .wc = 6.4f, .z1 = 0, .z2 = 0}; // 俯仰角速度
+LADRC_1st_Struct gyro_x_adrc = {.b0 = 6.4f, .wo = 86.0f, .wc = 6.8f, .z1 = 0, .z2 = 0}; // 横滚角速度
+LADRC_1st_Struct gyro_z_adrc = {.b0 = 5.6f, .wo = 60.0f, .wc = 4.5f, .z1 = 0, .z2 = 0}; // 偏航角速度
 
 // LADRC_1st_Struct *LADRC_p[3] = {&gyro_x_adrc, &gyro_y_adrc, &gyro_z_adrc};
 
@@ -133,24 +141,68 @@ void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
         // SCB_CleanInvalidateDCache_by_Addr(car_position, sizeof(car_position));
         SCB_CleanInvalidateDCache_by_Addr(data_arr, sizeof(data_arr));
 
-        position_x_pid.desire = data_arr[1];
-        position_x_pid.measure = 0;
-        position_y_pid.desire = data_arr[2];
-        position_y_pid.measure = 0;
-        PID_Calc(&position_x_pid);
-        PID_Calc(&position_y_pid);
+        if (op_new_flag)
+        {
+            op_new_flag = 0;
+
+            // 光流无效时跳过跟车计算（pitch/roll desire 保持上次值，姿态环照常运行）
+            if (upflow302_receive.upflow302_valid == 245)
+            {
+                // 用传感器报告的时间差作为真实 dt（光流不定频，必须实测）
+                float dt = upflow302_receive.upflow302_us / 1000000.0f; // us -> s
+                if (dt <= 0.001f || dt > 0.05f)
+                    dt = 0.01f; // 异常间隔钳位
+
+                // 光流速度 = 本帧位移/dt，低通滤波
+                float dx = (float)upflow302_receive.upflow302_x;
+                float dy = (float)upflow302_receive.upflow302_y;
+                flow_vel_x = 0.6f * dx + 0.4f * flow_vel_x;
+                flow_vel_y = 0.6f * dy + 0.4f * flow_vel_y;
+
+                // 把真实 dt 写入各 PID 的 period，让 PID_Calc 的 I/D 项量纲正确
+                position_x_pid.period     = dt;
+                position_y_pid.period     = dt;
+                car_velocity_x_pid.period = dt;
+                car_velocity_y_pid.period = dt;
+
+                // 外环位置环：误差 = 信标偏移 data_arr（期望=补偿到居中，测量=0）
+                position_x_pid.desire  = 0.0f;
+                position_x_pid.measure = -data_arr[1];
+                position_y_pid.desire  = 0.0f;
+                position_y_pid.measure = -data_arr[2];
+
+                // 内环速度环：测量 = 光流瞬时速度
+                car_velocity_x_pid.measure = flow_vel_x;
+                car_velocity_y_pid.measure = flow_vel_y;
+
+                PID_Calc_chain(&position_x_pid, &car_velocity_x_pid);
+                PID_Calc_chain(&position_y_pid, &car_velocity_y_pid);
+
+                if (flow_valid_count < 255)
+                    flow_valid_count++;
+            }
+        }
+
+        // position_x_pid.desire = data_arr[1];
+        // position_x_pid.measure = 0;
+        // position_y_pid.desire = data_arr[2];
+        // position_y_pid.measure = 0;
+        // PID_Calc(&position_x_pid);
+        // PID_Calc(&position_y_pid);
 
         // printf("Data:%d,   %d,   %d\n", imu660rc_gyro_x-x_zero, imu660rc_gyro_y-y_zero, imu660rc_gyro_z-z_zero);
         //  俯仰角
-        pitch_pid.desire = position_x_pid.output;
-        // pitch_pid.desire = -lora3a22_uart_transfer.joystick[2] / 100;          // 目标值为水平
+        // pitch_pid.desire = -position_y_pid.output;
+        // pitch_pid.desire = -car_velocity_y_pid.output;
+        pitch_pid.desire = lora3a22_uart_transfer.joystick[2] / 100;
         // pitch_pid.desire = compare_float(data_arr[1] / 10, -3.0f, 3.0f);
         pitch_pid.measure = imu660rc_pitch;                                    // 当前俯仰角
         float gyro_y_meas = (imu660rc_gyro_y / imu660rc_transition_factor[1]); // 当前Y轴角速度
 
         // 横滚角
-        roll_pid.desire = position_y_pid.output;
-        // roll_pid.desire = -lora3a22_uart_transfer.joystick[3] / 100;           // 目标值为水平
+        // roll_pid.desire = position_x_pid.output;
+        // roll_pid.desire = car_velocity_x_pid.output;              
+        roll_pid.desire = lora3a22_uart_transfer.joystick[3] / 100;           
         // roll_pid.desire = compare_float((data_arr[2] / 10), -3.0f, 3.0f);
         roll_pid.measure = imu660rc_roll;                                      // 当前横滚角
         float gyro_x_meas = (imu660rc_gyro_x / imu660rc_transition_factor[1]); // 当前X轴角速度
@@ -196,8 +248,9 @@ void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
 
         if (land_timer > 8000) // 等待八秒
         {
+            // land_timer = 8001;
             data_arr[3] = land_start;
-            goto land;
+            //goto land;
         }
 
         if (data_arr[0] == 1) // 识别到了信标
@@ -335,7 +388,7 @@ void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
             distance_pid.desire += lora3a22_uart_transfer.joystick[1] / 200;
         }
 
-        distance_pid.desire = compare_float(distance_pid.desire, 20.0f, 1600.0f);
+        distance_pid.desire = compare_float(distance_pid.desire, -100.0f, 1600.0f);
 
         // 姿态外环保持 1kHz
         PID_Calc(&pitch_pid);
@@ -351,8 +404,10 @@ void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
             last_tof_ms = isr_ms;
             if (dt > 0.05f)
                 dt = 0.05f; // 异常间隔限幅
-            if (dt < 0.01f)
-                dt = 0.02f;
+            // if (dt < 0.01f)
+            //     dt = 0.02f;
+            distance_pid.period = dt;
+            velocity_pid.period = dt;
 
             // 50Hz 低通滤波 + 姿态修正
             filtered_distance_mm = 0.5f * vl53l8cx_distance_mm + 0.5f * filtered_distance_mm;
@@ -398,7 +453,9 @@ void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
         //                 global_output + out_roll + out_pitch  // 电机4
         // );
 
-        if (vl53l8cx_distance_mm >= 120 || lora3a22_uart_transfer.switch_key[2] == 1)
+        // global_output = 3800;
+
+        if (vl53l8cx_distance_mm >= 150 || lora3a22_uart_transfer.switch_key[2] == 1)
         {
             // LADRC_1st_Update(adrc结构体, 期望值, 实际值, 周期时间)gyro_z_meas
             LADRC_1st_Update(&gyro_y_adrc, pitch_pid.output, gyro_y_meas, TIME_DELAY, MAX_DUTY);
@@ -496,18 +553,18 @@ void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
 
             // 一毫秒累加一次
             static uint8 distance_count = 0;
-            if (distance_count < 15)
+            if (distance_count < 30)
             {
                 distance_count++;
             }
-            else if (distance_count >= 15)
+            else if (distance_count >= 30)
             {
                 distance_count = 0;
                 // distance_pid.desire += lora3a22_uart_transfer.joystick[1] / 500;
-                distance_pid.desire -= 1;
+                distance_pid.desire -= 0.5;
             }
 
-            distance_pid.desire = compare_float(distance_pid.desire, -600.0f, 1700.0f);
+            distance_pid.desire = compare_float(distance_pid.desire, 0.0f, 1600.0f);
 
             // global_output += lora3a22_uart_transfer.joystick[1]/1000;
 
@@ -661,6 +718,24 @@ void pit0_ch0_isr() // 定时器通道 0 周期中断服务函数
         current_vel_mm_s = 0;                             // 归零垂直速度
         tof_new_flag = 0;                                 // 丢弃悬挂的旧数据标志
         last_tof_ms = isr_ms;                             // 重置 dt 基准
+
+        // 跟车串级PID归零
+        flow_vel_x = 0.0f;
+        flow_vel_y = 0.0f;
+        flow_valid_count = 0;
+        position_x_pid.integral = 0.0f;
+        position_y_pid.integral = 0.0f;
+        car_velocity_x_pid.integral = 0.0f;
+        car_velocity_y_pid.integral = 0.0f;
+        position_x_pid.last_err = 0.0f;
+        position_y_pid.last_err = 0.0f;
+        car_velocity_x_pid.last_err = 0.0f;
+        car_velocity_y_pid.last_err = 0.0f;
+        // 输出也清零，避免下次解锁时 desire 残留导致倾角跳变
+        position_x_pid.output = 0.0f;
+        position_y_pid.output = 0.0f;
+        car_velocity_x_pid.output = 0.0f;
+        car_velocity_y_pid.output = 0.0f;
         // SCB_CleanInvalidateDCache_by_Addr(&beacon_lost, sizeof(beacon_lost));
         // printf("%d\n" , beacon_lost);
         // SCB_CleanInvalidateDCache_by_Addr(car_position, sizeof(car_position));
@@ -766,6 +841,14 @@ void uart0_isr(void)
 #if DEBUG_UART_USE_INTERRUPT       // 如果开启 debug 串口中断
         debug_interrupr_handler(); // 调用 debug 串口接收处理函数 数据会被 debug 环形缓冲区读取
 #endif                             // 如果修改了 DEBUG_UART_INDEX 那这段代码需要放到对应的串口中断去
+    // upflow302_receive_callback();
+    // if (upflow302_finsh_flag)
+    // { // 帧完整接收后才触发
+    //     upflow302_finsh_flag = 0;
+    //     op_new_flag = 1;
+    // }
+    // op_new_flag = 1;
+
     }
     else // 串口0发送中断
     {

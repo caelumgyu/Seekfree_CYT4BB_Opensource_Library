@@ -86,44 +86,44 @@ ZF_WEAK uint32 seekfree_assistant_receive (uint8 *buff, uint32 length)
 //-------------------------------------------------------------------------------------------------------------------
 ZF_WEAK void seekfree_assistant_interface_init (seekfree_assistant_transfer_device_enum transfer_device)
 {
-    switch(transfer_device)
-    {
-        case SEEKFREE_ASSISTANT_DEBUG_UART:
-        {
-            seekfree_assistant_transfer_callback = debug_send_buffer;
-            seekfree_assistant_receive_callback = debug_read_ring_buffer;
-        }break;
+    // switch(transfer_device)
+    // {
+    //     case SEEKFREE_ASSISTANT_DEBUG_UART:
+    //     {
+    //         seekfree_assistant_transfer_callback = debug_send_buffer;
+    //         seekfree_assistant_receive_callback = debug_read_ring_buffer;
+    //     }break;
         
-        case SEEKFREE_ASSISTANT_WIRELESS_UART:
-        {
-            seekfree_assistant_transfer_callback = wireless_uart_send_buffer;
-            seekfree_assistant_receive_callback = wireless_uart_read_buffer;
-        }break;
+    //     case SEEKFREE_ASSISTANT_WIRELESS_UART:
+    //     {
+    //         seekfree_assistant_transfer_callback = wireless_uart_send_buffer;
+    //         seekfree_assistant_receive_callback = wireless_uart_read_buffer;
+    //     }break;
         
-        case SEEKFREE_ASSISTANT_BLE6A20:
-        {
-            seekfree_assistant_transfer_callback = ble6a20_send_buffer;
-            seekfree_assistant_receive_callback = ble6a20_read_buffer;
-        }break;
+    //     case SEEKFREE_ASSISTANT_BLE6A20:
+    //     {
+    //         seekfree_assistant_transfer_callback = ble6a20_send_buffer;
+    //         seekfree_assistant_receive_callback = ble6a20_read_buffer;
+    //     }break;
         
-        case SEEKFREE_ASSISTANT_WIFI_UART:
-        {
-            seekfree_assistant_transfer_callback = wifi_uart_send_buffer;
-            seekfree_assistant_receive_callback = wifi_uart_read_buffer;
-        }break;
+    //     case SEEKFREE_ASSISTANT_WIFI_UART:
+    //     {
+    //         seekfree_assistant_transfer_callback = wifi_uart_send_buffer;
+    //         seekfree_assistant_receive_callback = wifi_uart_read_buffer;
+    //     }break;
         
-        case SEEKFREE_ASSISTANT_WIFI_SPI:
-        {
-            seekfree_assistant_transfer_callback = wifi_spi_send_buffer;
-            seekfree_assistant_receive_callback = wifi_spi_read_buffer;
-        }break;
+    //     case SEEKFREE_ASSISTANT_WIFI_SPI:
+    //     {
+    //         seekfree_assistant_transfer_callback = wifi_spi_send_buffer;
+    //         seekfree_assistant_receive_callback = wifi_spi_read_buffer;
+    //     }break;
         
-        case SEEKFREE_ASSISTANT_CUSTOM:
-        {         
-            // 根据自己的需求 自行实现seekfree_assistant_transfer与seekfree_assistant_receive函数，完成数据的收发
+    //     case SEEKFREE_ASSISTANT_CUSTOM:
+    //     {         
+    //         // 根据自己的需求 自行实现seekfree_assistant_transfer与seekfree_assistant_receive函数，完成数据的收发
             
-        }break;
-    }
+    //     }break;
+   // }
 }
 
 

@@ -56,6 +56,10 @@ extern float out_pitch;
 
 extern PID_Struct distance_pid;
 extern PID_Struct velocity_pid;
+extern PID_Struct position_x_pid;
+extern PID_Struct position_y_pid;
+extern PID_Struct car_velocity_x_pid;
+extern PID_Struct car_velocity_y_pid;
 extern float global_output;
 extern float voltage;
 extern bool flow_complete;
@@ -90,7 +94,8 @@ int main(void)
     while (true)
     {
         vl53l8cx_get_distance();
-        tof_new_flag = 1; // notify 1kHz ISR for one altitude-hold update
+        tof_new_flag = 1;
+        // printf("Data:%d   ,%d   ,%0.2f    ,%0.2f    ,%0.2f    ,%d\r\n", upflow302_receive.upflow302_x, upflow302_receive.upflow302_y, position_x_pid.desire, position_y_pid.desire,distance_pid.desire, vl53l8cx_distance_mm);
         // 此处编写需要循环执行的代码
         // printf("Data:%0.2f,   %0.2f,   %0.2f\n", imu660rc_pitch, imu660rc_roll, imu660rc_yaw);
         // printf("Data:%0.2f,   %0.2f,   %0.2f\n", imu660rc_acc_x, imu660rc_acc_y, imu660rc_acc_z);
@@ -98,7 +103,7 @@ int main(void)
         // if (print_count >= 5) // lower print rate (~10Hz) to avoid serial stalling the TOF poll period
         // {
         //     print_count = 0;
-        //     printf("Data:%0.2f,   %0.2f,   %0.2f,   %0.2f,    %d\n", distance_pid.output, velocity_pid.output, global_output, distance_pid.desire, vl53l8cx_distance_mm);
+        printf("Data:%0.2f,   %0.2f,   %0.2f,   %0.2f,    %d\n", distance_pid.output, velocity_pid.output, global_output, distance_pid.desire, vl53l8cx_distance_mm);
         // }
         // else
         // {
